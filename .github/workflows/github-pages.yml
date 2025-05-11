@@ -7,6 +7,8 @@ jobs:
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    permissions: # <-- ADD THIS SECTION
+      contents: write   # This grants the workflow write access to your repository's contents
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
