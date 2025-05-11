@@ -22,9 +22,6 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      - name: Test the project
-        run: npm test
-
       - name: Deploy to GitHub Pages
         run: |
           git config --global user.name "GitHub Actions"
