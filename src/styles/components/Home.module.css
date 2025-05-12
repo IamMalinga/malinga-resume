@@ -1,0 +1,56 @@
+
+[data-theme='light'] {
+  --background-color: #f7fafc;
+  --hero-bg: #2d3748;
+  --featured-bg: #f7fafc;
+  --text-color: #2d3748;
+  --primary-color: #2563eb;
+}
+
+[data-theme='dark'] {
+  --background-color: #1a202c;
+  --hero-bg: #e2e8f0;
+  --featured-bg: #1a202c;
+  --text-color: #e2e8f0;
+  --primary-color: #60a5fa;
+}
+
+.homeContainer {
+  background: linear-gradient(180deg, var(--hero-bg) 0%, var(--featured-bg) 50%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.featured {
+  padding: 40px 20px;
+  background: transparent; /* Remove solid background to let gradient show */
+  min-height: calc(100vh - 200px);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .featured {
+    padding: 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .homeContainer {
+    background: linear-gradient(180deg, var(--hero-bg) 0%, var(--featured-bg) 40%); /* Adjust gradient stop for mobile */
+  }
+}

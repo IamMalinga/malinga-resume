@@ -1,0 +1,28 @@
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'QuickSand', sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Direct theme styles for debugging */
+[data-theme='light'] {
+  background-color: #ffffff;
+  color: #333;
+}
+
+[data-theme='dark'] {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

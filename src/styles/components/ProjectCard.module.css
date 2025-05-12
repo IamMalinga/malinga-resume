@@ -1,0 +1,132 @@
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 0 15px #2563eb;
+  backdrop-filter: blur(15px);
+  border: 1px solid #2563eb;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card.light {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), inset 0 0 15px #60a5fa;
+  border-color: #2563eb;
+}
+
+.card:hover {
+  transform: translateY(-10px) rotateX(5deg);
+  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.4), inset 0 0 20px #60a5fa;
+}
+
+.card.light:hover {
+  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.2), inset 0 0 20px #60a5fa;
+}
+
+.title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.title.light {
+  color: #2563eb;
+  text-shadow: 0 0 5px #60a5fa;
+}
+
+.duration {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.duration.light {
+  color: #4a5568;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.description.light {
+  color: #2a2a72;
+}
+
+.tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.techTag {
+  background: #e5e7eb;
+  color: #2563eb;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  border: 1px solid #2563eb;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.techTag.light {
+  background: rgba(255, 0, 204, 0.2);
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+.techTag:hover {
+  transform: scale(1.1);
+}
+
+.techTag.light:hover {
+  background: #ff00cc;
+  color: #f0f4f8;
+}
+
+.category {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.category.light {
+  background: #ff00cc;
+  color: #f0f4f8;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .techTag {
+    font-size: 0.75rem;
+  }
+
+  .category {
+    font-size: 0.75rem;
+  }
+}
