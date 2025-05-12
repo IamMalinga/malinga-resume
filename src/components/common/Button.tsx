@@ -1,34 +1,33 @@
-import React from 'react';
-import styles from '../../styles/components/Button.module.css';
-import classNames from 'classnames';
+import React, { forwardRef } from 'react';
+import styles from '../../styles/components/Button.module.css'; // Adjust the path as needed
 
+// Define the ButtonProps interface
 interface ButtonProps {
-  variant?: 'primary' | 'secondary';
   type?: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
-  children: React.ReactNode;
-  onClick?: () => void;
   className?: string;
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | string; // Add variant prop
 }
 
-const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  type = 'button',
-  disabled = false,
-  children,
-  onClick,
-  className,
-}) => {
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={classNames(styles.button, styles[variant], className)}
-    >
-      {children}
-    </button>
-  );
-};
+// Use forwardRef to allow ref forwarding
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ type = 'button', className = '', children, variant = 'primary' }, ref) => {
+    // Optionally, you can use variant to apply different styles
+    const variantClass = variant === 'primary' ? styles.primary : styles.secondary;
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        className={`${styles.button} ${variantClass} ${className}`}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+// Optional: Set display name for better debugging
+Button.displayName = 'Button';
 
 export default Button;

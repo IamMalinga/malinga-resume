@@ -4,7 +4,7 @@ import { type ContactFormData } from '../../types/contact';
 import styles from '../../styles/components/ContactForm.module.css';
 import Button from '../common/Button';
 import { gsap } from 'gsap';
-import { useTheme } from '../../hooks/useTheme'; // Assuming this hook exists
+import { useTheme } from '../../hooks/useTheme';
 
 const ContactForm: React.FC = () => {
   const {
@@ -27,7 +27,7 @@ const ContactForm: React.FC = () => {
       { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }
     );
     gsap.fromTo(
-      fieldsRef.current,
+      fieldsRef.current.filter((el): el is HTMLDivElement => el !== null),
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'power2.out' }
     );
@@ -50,7 +50,12 @@ const ContactForm: React.FC = () => {
       onSubmit={handleSubmit(onSubmit)}
       className={`${styles.form} ${theme === 'light' ? styles.light : ''}`}
     >
-      <div ref={(el) => (fieldsRef.current[0] = el)} className={styles.field}>
+      <div
+        ref={(el) => {
+          fieldsRef.current[0] = el;
+        }}
+        className={styles.field}
+      >
         <label htmlFor="name">Name</label>
         <input
           id="name"
@@ -60,7 +65,12 @@ const ContactForm: React.FC = () => {
         />
         {errors.name && <span className={styles.error}>{errors.name.message}</span>}
       </div>
-      <div ref={(el) => (fieldsRef.current[1] = el)} className={styles.field}>
+      <div
+        ref={(el) => {
+          fieldsRef.current[1] = el;
+        }}
+        className={styles.field}
+      >
         <label htmlFor="email">Email</label>
         <input
           id="email"
@@ -76,7 +86,12 @@ const ContactForm: React.FC = () => {
         />
         {errors.email && <span className={styles.error}>{errors.email.message}</span>}
       </div>
-      <div ref={(el) => (fieldsRef.current[2] = el)} className={styles.field}>
+      <div
+        ref={(el) => {
+          fieldsRef.current[2] = el;
+        }}
+        className={styles.field}
+      >
         <label htmlFor="message">Message</label>
         <textarea
           id="message"
