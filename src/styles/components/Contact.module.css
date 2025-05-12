@@ -1,0 +1,99 @@
+.contact {
+  position: relative;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.contact.light {
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e4f5 100%);
+}
+
+.particleCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #00ffcc;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ff99;
+  position: relative;
+  z-index: 2;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.title.light {
+  color: #ff00cc;
+  text-shadow: 0 0 10px #ff00cc, 0 0 20px #ff00cc, 0 0 30px #ff1493;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.socialLink {
+  color: #00ffcc;
+  font-size: 1.8rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+  text-decoration: none;
+}
+
+.socialLink.light {
+  color: #ff00cc;
+}
+
+.socialLink:hover {
+  color: #00ff99;
+  transform: scale(1.2);
+  text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ff99;
+}
+
+.socialLink.light:hover {
+  color: #ff1493;
+  text-shadow: 0 0 10px #ff00cc, 0 0 20px #ff1493;
+}
+
+/* Assuming ContactForm has its own styles, we won't override it here */
+@media (max-width: 768px) {
+  .contact {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .socialLinks {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .socialLink {
+    font-size: 1.5rem;
+  }
+
+  .particleCanvas {
+    display: none;
+  }
+}
