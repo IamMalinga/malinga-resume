@@ -37,11 +37,14 @@ const Blog: React.FC = () => {
       { opacity: 0, y: -50 },
       { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
     );
-    gsap.fromTo(
-      postsRef.current?.children,
-      { opacity: 0, y: 30, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.2, ease: 'back.out(1.7)' }
-    );
+    if (postsRef.current?.children) {
+      const childrenArray = Array.from(postsRef.current.children);
+      gsap.fromTo(
+        childrenArray,
+        { opacity: 0, y: 30, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.2, ease: 'back.out(1.7)' }
+      );
+    }
 
     // Three.js particle background
     if (!canvasRef.current) return;
