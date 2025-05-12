@@ -6,13 +6,14 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   className?: string;
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | string; // Add variant prop
+  variant?: 'primary' | 'secondary' | string; // Existing variant prop
+  onClick?: () => void; // Add onClick prop
 }
 
 // Use forwardRef to allow ref forwarding
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ type = 'button', className = '', children, variant = 'primary' }, ref) => {
-    // Optionally, you can use variant to apply different styles
+  ({ type = 'button', className = '', children, variant = 'primary', onClick }, ref) => {
+    // Apply variant-specific styles
     const variantClass = variant === 'primary' ? styles.primary : styles.secondary;
 
     return (
@@ -20,6 +21,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         className={`${styles.button} ${variantClass} ${className}`}
+        onClick={onClick} // Pass onClick to the button element
       >
         {children}
       </button>

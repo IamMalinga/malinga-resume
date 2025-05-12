@@ -25,7 +25,7 @@ const Contact: React.FC = () => {
       { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }
     );
     gsap.fromTo(
-      socialRef.current?.children,
+      socialRef.current ? Array.from(socialRef.current.children) : [],
       { opacity: 0, x: -20 },
       { opacity: 1, x: 0, duration: 0.8, stagger: 0.2, ease: 'power2.out' }
     );
