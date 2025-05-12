@@ -148,11 +148,11 @@ const Portfolio: React.FC = () => {
     };
   }, [theme]);
 
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
 
   return (
     <main className={styles.portfolio} data-theme={theme}>
@@ -162,7 +162,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#basics"
-              ref={(el) => (navItemsRef.current[0] = el)}
+              ref={(el) => {
+                navItemsRef.current[0] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(basicsRef);
@@ -174,7 +176,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#work"
-              ref={(el) => (navItemsRef.current[1] = el)}
+              ref={(el) => {
+                navItemsRef.current[1] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(workRef);
@@ -186,7 +190,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#education"
-              ref={(el) => (navItemsRef.current[2] = el)}
+              ref={(el) => {
+                navItemsRef.current[2] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(educationRef);
@@ -198,7 +204,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#projects"
-              ref={(el) => (navItemsRef.current[3] = el)}
+              ref={(el) => {
+                navItemsRef.current[3] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(projectsRef);
@@ -210,7 +218,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#skills"
-              ref={(el) => (navItemsRef.current[4] = el)}
+              ref={(el) => {
+                navItemsRef.current[4] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(skillsRef);
@@ -222,7 +232,9 @@ const Portfolio: React.FC = () => {
           <li>
             <a
               href="#courses"
-              ref={(el) => (navItemsRef.current[5] = el)}
+              ref={(el) => {
+                navItemsRef.current[5] = el;
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(coursesRef);
