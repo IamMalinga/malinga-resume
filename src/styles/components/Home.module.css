@@ -1,56 +1,103 @@
-
 [data-theme='light'] {
   --background-color: #f7fafc;
   --hero-bg: #2d3748;
   --featured-bg: #f7fafc;
   --text-color: #2d3748;
   --primary-color: #2563eb;
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --card-border: rgba(255, 255, 255, 0.3);
 }
 
 [data-theme='dark'] {
-  --background-color: #1a202c;
   --hero-bg: #e2e8f0;
   --featured-bg: #1a202c;
   --text-color: #e2e8f0;
   --primary-color: #60a5fa;
+  --card-bg: rgba(26, 32, 44, 0.8);
+  --card-border: rgba(226, 232, 240, 0.2);
 }
 
 .homeContainer {
-  background: linear-gradient(180deg, var(--hero-bg) 0%, var(--featured-bg) 50%);
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  margin-bottom: 50px;
 }
 
 .featured {
-  padding: 40px 20px;
-  background: transparent; /* Remove solid background to let gradient show */
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px); /* Glassmorphism effect */
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
   min-height: calc(100vh - 200px);
   text-align: center;
   position: relative;
   z-index: 2;
+  margin: 0 10%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
+}
+
+.featuredTitle {
+  font-size: 3.5rem;
+  color: var(--text-color);
+  margin-bottom: 40px;
+  background: linear-gradient(90deg, var(--primary-color), var(--text-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+  font-weight: 900;
+  justify-content: center;
+  display: flex;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 2;
 }
 
+.projectCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 15px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
 @media (max-width: 768px) {
   .featured {
-    padding: 20px;
+    padding: 30px 10px;
+    margin: 0 5%;
+  }
+
+  .featuredTitle {
+    font-size: 2rem;
   }
 
   .grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured {
+    padding: 20px;
+    margin: 0;
   }
 
-  .homeContainer {
-    background: linear-gradient(180deg, var(--hero-bg) 0%, var(--featured-bg) 40%); /* Adjust gradient stop for mobile */
+  .featuredTitle {
+    font-size: 1.8rem;
+  }
+
+  .grid {
+    gap: 15px;
   }
 }

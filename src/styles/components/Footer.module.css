@@ -1,33 +1,116 @@
+[data-theme='light'] {
+  --primary-color: #2563eb;
+  --secondary-color: #93c5fd;
+  --text-color: #000000;
+  --background-gradient-start: #e5e7eb;
+  --background-gradient-end: #f7fafc;
+}
+
+[data-theme='dark'] {
+  --primary-color: #000000;
+  --secondary-color: #93c5fd;
+  --text-color: #e2e8f0;
+  --background-gradient-start: #040505;
+  --background-gradient-end: #1f2937;
+}
+
 .footer {
-  background: #1f2937;
-  color: #ffffff;
-  padding: 2rem;
+  background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end));
+  color: var(--text-color);
+  padding: 2rem 2rem 3rem;
   text-align: center;
-  height: 50vh;
+  min-height: 20vh;
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-size: cover;
+  animation: wave 10s linear infinite;
+}
+
+@keyframes wave {
+  0% { background-position-x: 0; }
+  100% { background-position-x: 1200px; }
 }
 
 .socials {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .socials a {
-  color: #93c5fd;
-  text-decoration: none;
-  font-size: 1rem;
+  color: var(--secondary-color);
+  font-size: 2rem;
+  transition: all 0.3s ease;
 }
 
-.socials a:hover {
-  color: #2563eb;
+.copyright {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.copyright::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background: var(--primary-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: translateX(-50%) scaleX(1); }
+  50% { transform: translateX(-50%) scaleX(1.2); }
+  100% { transform: translateX(-50%) scaleX(1); }
 }
 
 @media (max-width: 768px) {
+  .footer {
+    padding: 1.5rem;
+    min-height: 15vh;
+  }
+
   .socials {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+  }
+
+  .socials a {
+    font-size: 1.5rem;
+  }
+
+  .copyright {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 1rem;
+  }
+
+  .socials a {
+    font-size: 1.2rem;
+  }
+
+  .copyright {
+    font-size: 0.7rem;
   }
 }
