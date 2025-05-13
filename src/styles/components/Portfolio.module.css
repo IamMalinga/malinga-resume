@@ -1,33 +1,27 @@
 [data-theme='light'] {
-  --background-color: #f7fafc;
   --text-color: #2d3748;
   --primary-color: #2563eb;
   --secondary-color: rgba(255, 255, 255, 0.9);
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   --date-background: #3182ce;
-  --nav-background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
   --nav-text-color: #2d3748;
   --nav-active-color: #2563eb;
   --nav-hover-color: #1d4ed8;
   --nav-line-color: #2563eb;
   --nav-marker-bg: #2563eb;
-  --nav-marker-glow: rgba(37, 99, 235, 0.5);
 }
 
 [data-theme='dark'] {
-  --background-color: #1a202c;
   --text-color: #e2e8f0;
   --primary-color: #60a5fa;
   --secondary-color: rgba(45, 55, 72, 0.9);
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   --date-background: #4299e1;
-  --nav-background: linear-gradient(180deg, rgba(26, 32, 44, 0.8), rgba(26, 32, 44, 0.6));
   --nav-text-color: #e2e8f0;
   --nav-active-color: #60a5fa;
   --nav-hover-color: #3b82f6;
   --nav-line-color: #60a5fa;
   --nav-marker-bg: #60a5fa;
-  --nav-marker-glow: rgba(96, 165, 250, 0.5);
 }
 
 .portfolio {

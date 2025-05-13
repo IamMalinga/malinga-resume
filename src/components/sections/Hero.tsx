@@ -2,234 +2,217 @@ import React, { useEffect, useRef } from 'react';
 import styles from '../../styles/components/Hero.module.css';
 import Button from '../common/Button';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Profile from '../../assets/profile.jpg'; // Replace with your actual profile image path
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Hero: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const canvas1Ref = useRef<HTMLCanvasElement>(null);
-  const canvas2Ref = useRef<HTMLCanvasElement>(null);
-  const canvas3Ref = useRef<HTMLCanvasElement>(null);
+  // Ripple refs for the center position
+  const ripple1Ref = useRef<HTMLDivElement>(null);
+  const ripple2Ref = useRef<HTMLDivElement>(null);
+  const ripple3Ref = useRef<HTMLDivElement>(null);
+  // Ripple refs for top-left position
+  const rippleTopLeft1Ref = useRef<HTMLDivElement>(null);
+  const rippleTopLeft2Ref = useRef<HTMLDivElement>(null);
+  const rippleTopLeft3Ref = useRef<HTMLDivElement>(null);
+  // Ripple refs for bottom-right position
+  const rippleBottomRight1Ref = useRef<HTMLDivElement>(null);
+  const rippleBottomRight2Ref = useRef<HTMLDivElement>(null);
+  const rippleBottomRight3Ref = useRef<HTMLDivElement>(null);
+  // Skills section ref
+  const skillsSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // GSAP animation for text and button
+    // GSAP animation for text and button on load
     const tl = gsap.timeline();
 
+    const titleText = titleRef.current?.innerText || '';
+    const chars = titleText.split(' ');
+    titleRef.current!.innerHTML = chars
+      .map(char => `<span class="${styles.char}">${char}</span>`)
+      .join(' ');
+
     tl.fromTo(
-      titleRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
+      titleRef.current!.querySelectorAll(`.${styles.char}`),
+      { opacity: 0, y: 20, scale: 0.8, rotateX: 90 },
+      { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 1.5, stagger: 0.07, ease: 'power3.out' }
     )
       .fromTo(
         subtitleRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-        '-=0.5'
+        { opacity: 0, y: 30, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out' },
+        '-=0.7'
       )
       .fromTo(
         buttonRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-        '-=0.3'
+        { opacity: 0, scale: 0.5, rotateY: 180 },
+        { opacity: 1, scale: 1, rotateY: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' },
+        '-=0.5'
       );
+
+    // Ripple animation function
+    const rippleAnimation = (ripple: HTMLDivElement | null, delay: number) => {
+      if (ripple) {
+        gsap.fromTo(
+          ripple,
+          { scale: 0, opacity: 0.5 },
+          {
+            scale: 1.5,
+            opacity: 0,
+            duration: 3,
+            ease: 'power1.out',
+            repeat: -1,
+            delay,
+          }
+        );
+      }
+    };
+
+    // Center ripples
+    rippleAnimation(ripple1Ref.current, 0);
+    rippleAnimation(ripple2Ref.current, 1);
+    rippleAnimation(ripple3Ref.current, 2);
+
+    // Top-left ripples
+    rippleAnimation(rippleTopLeft1Ref.current, 0.5);
+    rippleAnimation(rippleTopLeft2Ref.current, 1.5);
+    rippleAnimation(rippleTopLeft3Ref.current, 2.5);
+
+    // Bottom-right ripples
+    rippleAnimation(rippleBottomRight1Ref.current, 0.8);
+    rippleAnimation(rippleBottomRight2Ref.current, 1.8);
+    rippleAnimation(rippleBottomRight3Ref.current, 2.8);
+
+    // ScrollTrigger animation for hero section
+    ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: 'top 80%',
+      end: 'bottom 20%',
+      onEnter: () => gsap.to(heroRef.current, { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }),
+      onLeaveBack: () => gsap.to(heroRef.current, { opacity: 0.7, scale: 0.95, duration: 1, ease: 'power2.out' }),
+      toggleActions: 'play reverse play reverse',
+    });
+
+    // GSAP animation for skill cards
+    if (skillsSectionRef.current) {
+      const skillCards = skillsSectionRef.current.querySelectorAll(`.${styles.skillCard}`);
+      gsap.fromTo(
+        skillCards,
+        { opacity: 0, y: 30, scale: 0.8 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: skillsSectionRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+    }
 
     return () => {
       tl.kill();
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      gsap.killTweensOf([
+        ripple1Ref.current, ripple2Ref.current, ripple3Ref.current,
+        rippleTopLeft1Ref.current, rippleTopLeft2Ref.current, rippleTopLeft3Ref.current,
+        rippleBottomRight1Ref.current, rippleBottomRight2Ref.current, rippleBottomRight3Ref.current
+      ]);
     };
   }, []);
 
-  useEffect(() => {
-    if (!canvas1Ref.current || !canvas2Ref.current || !canvas3Ref.current) return;
+  const skills = [
+    { name: 'React', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/react.svg' },
+    { name: 'Angular', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/angular.svg' },
+    { name: 'Spring Boot', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/spring.svg' },
+    { name: 'Android', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/android.svg' },
+    { name: 'Node.js', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/nodedotjs.svg' },
+    { name: 'Docker', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/docker.svg' },
+    { name: 'Cybersecurity', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/cisco.svg' },
+  ];
 
-    const canvas1 = canvas1Ref.current;
-    const canvas2 = canvas2Ref.current;
-    const canvas3 = canvas3Ref.current;
-    const ctx1 = canvas1.getContext('2d');
-    const ctx2 = canvas2.getContext('2d');
-    const ctx3 = canvas3.getContext('2d');
-
-    if (!ctx1 || !ctx2 || !ctx3) return;
-
-    canvas1.width = window.innerWidth;
-    canvas1.height = window.innerHeight;
-    canvas2.width = window.innerWidth;
-    canvas2.height = window.innerHeight;
-    canvas3.width = window.innerWidth;
-    canvas3.height = window.innerHeight;
-
-    // Symbol class for Matrix characters
-    class Symbol {
-      characters: string;
-      x: number;
-      y: number;
-      fontSize: number;
-      text: string;
-      canvasHeight: number;
-
-      constructor(x: number, y: number, fontSize: number, canvasHeight: number) {
-        this.characters = '01010101000111110001010101110001110000011000100001ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678900101010001110001000100111111000100001001abcdefghijklmnopqrstuvwxyz0123456789';
-        this.x = x;
-        this.y = y;
-        this.fontSize = fontSize;
-        this.text = 'A';
-        this.canvasHeight = canvasHeight;
-      }
-
-      draw(context: CanvasRenderingContext2D, context2: CanvasRenderingContext2D) {
-        this.text = this.characters.charAt(Math.floor(Math.random() * this.characters.length));
-        context.fillText(this.text, this.x * this.fontSize, this.y * this.fontSize);
-        context2.fillText(this.text, this.x * this.fontSize, this.y * this.fontSize);
-        if (this.y * this.fontSize > this.canvasHeight && Math.random() > 0.97) {
-          this.y = 0;
-        } else {
-          this.y += 0.9;
-        }
-      }
-    }
-
-    // Effect class to manage the Matrix rain
-    class Effect {
-      fontSize: number;
-      canvasWidth: number;
-      canvasHeight: number;
-      columns: number;
-      symbols: Symbol[];
-
-      constructor(canvasWidth: number, canvasHeight: number) {
-        this.fontSize = 16;
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-        this.columns = this.canvasWidth / this.fontSize;
-        this.symbols = [];
-        this.#initialize();
-      }
-
-      #initialize() {
-        for (let i = 0; i < this.columns; i++) {
-          this.symbols[i] = new Symbol(i, 0, this.fontSize, this.canvasHeight);
-        }
-      }
-
-      resize(width: number, height: number) {
-        this.canvasWidth = width;
-        this.canvasHeight = height;
-        this.columns = this.canvasWidth / this.fontSize;
-        this.symbols = [];
-        this.#initialize();
-      }
-    }
-
-    const effect = new Effect(canvas1.width, canvas1.height);
-    let lastTime = 0;
-    const fps = 26;
-    const nextFrame = 1000 / fps;
-    let timer = 0;
-
-    // Texture animation with GSAP
-    const textureTl = gsap.timeline({ repeat: -1, yoyo: true });
-    let textureOffsetX = 0;
-    let textureOffsetY = 0;
-    textureTl.to(
-      { offsetX: 0, offsetY: 0 },
-      {
-        duration: 5,
-        offsetX: 100,
-        offsetY: 100,
-        onUpdate: () => {
-          textureOffsetX = textureTl.progress() * 100;
-          textureOffsetY = textureTl.progress() * 100;
-        },
-        ease: 'sine.inOut',
-      }
-    );
-
-    // Animation loop
-    const animate = (timeStamp: number) => {
-      const deltaTime = timeStamp - lastTime;
-      lastTime = timeStamp;
-      if (timer > nextFrame) {
-        // Matrix rain on canvas1 and canvas2
-        ctx1.textAlign = "center";
-        ctx1.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
-        ctx1.font = effect.fontSize + 'px monospace';
-        ctx1.fillStyle = '#2563eb';
-
-        ctx2.textAlign = "center";
-        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-        ctx2.font = effect.fontSize + 'px monospace';
-        ctx2.fillStyle = 'white';
-
-        effect.symbols.forEach(symbol => symbol.draw(ctx1, ctx2));
-
-        // Texture on canvas3
-        ctx3.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        ctx3.fillRect(0, 0, canvas3.width, canvas3.height);
-        for (let x = 0; x < canvas3.width; x += 10) {
-          for (let y = 0; y < canvas3.height; y += 10) {
-            const noise = Math.sin(x * 0.1 + textureOffsetX) * Math.cos(y * 0.1 + textureOffsetY) * 50 + 50;
-            ctx3.fillStyle = `rgba(37, 99, 235, ${noise / 255})`;
-            ctx3.fillRect(x, y, 10, 10);
-          }
-        }
-
-        timer = 0;
-      } else {
-        timer += deltaTime;
-      }
-      requestAnimationFrame(animate);
-    };
-
-    animate(0);
-
-    // Handle resize
-    const handleResize = () => {
-      canvas1.width = window.innerWidth;
-      canvas1.height = window.innerHeight;
-      canvas2.width = window.innerWidth;
-      canvas2.height = window.innerHeight;
-      canvas3.width = window.innerWidth;
-      canvas3.height = window.innerHeight;
-      effect.resize(canvas1.width, canvas1.height);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => {
-      textureTl.kill();
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  const handleCvDownload = () => {
+    const cvUrl = '/malinga samarakoon.pdf'; // Adjust this path to your CV file location in the public directory
+    const link = document.createElement('a');
+    link.href = cvUrl;
+    link.download = 'Malinga_CV.pdf'; // Customize the downloaded file name
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
-    <section className={styles.hero} ref={heroRef}>
-      <section className={styles.matrixSection}>
-        <canvas ref={canvas3Ref} className={styles.textureCanvas} />
-        <canvas ref={canvas1Ref} className={styles.canvas} />
-        <canvas ref={canvas2Ref} className={styles.canvasOverlay} />
-      </section>
-      <div className="relative z-10 container mx-auto px-4 py-20 md:py-32 text-center">
-        <h1
-          ref={titleRef}
-          className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-200 mb-6 leading-tight"
-        >
-          Welcome to My Matrix
-        </h1>
-        <p
-          ref={subtitleRef}
-          className="text-lg md:text-xl text-green-300 max-w-2xl mx-auto mb-8"
-        >
-          Diving into the code and crafting the future of technology.
-        </p>
-        <Button
-          ref={buttonRef}
-          variant="primary"
-          className="mt-6 px-8 py-3 text-lg font-semibold rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          Enter the Code
-        </Button>
+    <section className={styles.hero} ref={heroRef} aria-label="Hero Section with Profile Introduction">
+      <div className={styles.heroContainer}>
+        <div className={styles.textContent}>
+          <h1
+            ref={titleRef}
+            className={`${styles.title} text-4xl md:text-6xl font-bold mb-6 leading-tight`}
+          >
+            Hello!, I am Malinga.
+          </h1>
+          <p
+            ref={subtitleRef}
+            className={`${styles.subtitle} text-lg md:text-xl max-w-2xl mb-8`}
+          >
+            This is my personal portfolio showcasing my journey as a passionate developer. I specialize in crafting robust applications using technologies like React, Angular, and Spring Boot, while ensuring scalability through DevOps practices and security with a focus on cybersecurity. Explore my projects to see how I turn ideas into impactful, secure, and scalable solutions!
+          </p>
+          <Button
+            ref={buttonRef}
+            variant="primary"
+             onClick={handleCvDownload}
+            className={`${styles.button} px-8 py-3 text-lg font-semibold rounded-full shadow-lg transition-all duration-300`}
+            aria-label="Enter the Code"
+          >
+            View My CV
+          </Button>
+        </div>
+        {/* Center ripple container */}
+        <div className={styles.rippleContainer}>
+          <div ref={ripple1Ref} className={styles.ripple}></div>
+          <div ref={ripple2Ref} className={styles.ripple}></div>
+          <div ref={ripple3Ref} className={styles.ripple}></div>
+        </div>
+        {/* Top-left ripple container */}
+        <div className={`${styles.rippleContainer} ${styles.rippleTopLeft}`}>
+          <div ref={rippleTopLeft1Ref} className={styles.ripple}></div>
+          <div ref={rippleTopLeft2Ref} className={styles.ripple}></div>
+          <div ref={rippleTopLeft3Ref} className={styles.ripple}></div>
+        </div>
+        {/* Bottom-right ripple container */}
+        <div className={`${styles.rippleContainer} ${styles.rippleBottomRight}`}>
+          <div ref={rippleBottomRight1Ref} className={styles.ripple}></div>
+          <div ref={rippleBottomRight2Ref} className={styles.ripple}></div>
+          <div ref={rippleBottomRight3Ref} className={styles.ripple}></div>
+        </div>
+        <div className={styles.imageContent}>
+          <img
+            src={Profile}
+            alt="Malinga's Profile"
+            className={styles.profileImage}
+          />
+        </div>
+      </div>
+      {/* Skills Section */}
+      <div className={styles.skillsSection} ref={skillsSectionRef}>
+        <div className={styles.skillsGrid}>
+          {skills.map((skill, index) => (
+            <div key={index} className={styles.skillCard}>
+              <img src={skill.icon} alt={`${skill.name} icon`} className={styles.skillIcon} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
