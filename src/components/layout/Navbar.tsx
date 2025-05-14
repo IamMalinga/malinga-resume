@@ -30,14 +30,6 @@ const Navbar: React.FC = () => {
         Resume
       </NavLink>
       <NavLink
-        to="/contact"
-        className={({ isActive }) =>
-          isActive ? styles.activeLink : styles.link
-        }
-      >
-        Contact
-      </NavLink>
-      <NavLink
         to="/blog"
         className={({ isActive }) =>
           isActive ? styles.activeLink : styles.link

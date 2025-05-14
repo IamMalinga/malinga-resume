@@ -6,11 +6,20 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AppRoutes from './routes';
 import './styles/global.css';
+import { initGA, logPageView } from './utils/analytics'; // Import GA functions
 
 // Component to handle dynamic title
 const TitleUpdater: React.FC = () => {
   const location = useLocation();
   const baseTitle = 'Malinga Samarakoon'; // Your default/base title
+
+  useEffect(() => {
+    initGA(); // Initialize once on mount
+  }, []);
+
+  useEffect(() => {
+    logPageView(location.pathname + location.search);
+  }, [location]);
 
   useEffect(() => {
     let pageTitle = baseTitle;
@@ -24,7 +33,7 @@ const TitleUpdater: React.FC = () => {
         pageTitle = `About | ${baseTitle}`;
         break;
       case '/portfolio':
-        pageTitle = `Portfolio | ${baseTitle}`;
+        pageTitle = `Resume | ${baseTitle}`;
         break;
       case '/contact':
         pageTitle = `Contact | ${baseTitle}`;
