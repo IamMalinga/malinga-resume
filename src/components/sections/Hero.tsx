@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/components/Hero.module.css';
 import Button from '../common/Button';
 import { gsap } from 'gsap';
@@ -12,6 +12,8 @@ const Hero: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const contactButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   // Ripple refs for the center position
   const ripple1Ref = useRef<HTMLDivElement>(null);
   const ripple2Ref = useRef<HTMLDivElement>(null);
@@ -26,9 +28,13 @@ const Hero: React.FC = () => {
   const rippleBottomRight3Ref = useRef<HTMLDivElement>(null);
   // Skills section ref
   const skillsSectionRef = useRef<HTMLDivElement>(null);
+  // Social links container ref
+  const socialLinksRef = useRef<HTMLDivElement>(null);
+  // State for modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // GSAP animation for text and button on load
+    // GSAP animation for text, button, and contact button on load
     const tl = gsap.timeline();
 
     const titleText = titleRef.current?.innerText || '';
@@ -53,7 +59,28 @@ const Hero: React.FC = () => {
         { opacity: 0, scale: 0.5, rotateY: 180 },
         { opacity: 1, scale: 1, rotateY: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' },
         '-=0.5'
+      )
+      .fromTo(
+        socialLinksRef.current,
+        { opacity: 0, x: 20 },
+        { opacity: 1, x: 0, duration: 1, ease: 'power3.out' },
+        '-=0.5'
+      )
+      .fromTo(
+        contactButtonRef.current,
+        { opacity: 0, scale: 0.5 },
+        { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' },
+        '-=0.5'
       );
+
+    // GSAP animation for modal
+    if (isModalOpen && modalRef.current) {
+      gsap.fromTo(
+        modalRef.current,
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: 'power3.out' }
+      );
+    }
 
     // Ripple animation function
     const rippleAnimation = (ripple: HTMLDivElement | null, delay: number) => {
@@ -118,7 +145,6 @@ const Hero: React.FC = () => {
           },
         }
       );
-
     }
 
     return () => {
@@ -130,7 +156,7 @@ const Hero: React.FC = () => {
         rippleBottomRight1Ref.current, rippleBottomRight2Ref.current, rippleBottomRight3Ref.current
       ]);
     };
-  }, []);
+  }, [isModalOpen]);
 
   const skills = [
     { name: 'React', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/react.svg' },
@@ -142,14 +168,45 @@ const Hero: React.FC = () => {
     { name: 'Cybersecurity', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/cisco.svg' },
   ];
 
+  const socialLinks = [
+    { name: 'Email', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg', url: 'mailto:your.email@example.com' },
+    { name: 'LinkedIn', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg', url: 'https://www.linkedin.com/in/yourprofile' },
+    { name: 'StackOverflow', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/stackoverflow.svg', url: 'https://stackoverflow.com/users/yourprofile' },
+    { name: 'HackerRank', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hackerrank.svg', url: 'https://www.hackerrank.com/yourprofile' },
+    { name: 'Dev', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/devdotto.svg', url: 'https://dev.to/yourprofile' },
+  ];
+
   const handleCvDownload = () => {
-    const cvUrl = '/malinga samarakoon.pdf'; // Adjust this path to your CV file location in the public directory
+    const cvUrl = 'https://gkogquqptohjirdxwxhh.supabase.co/storage/v1/object/sign/resumedata/Malinga%20Samarakoon.pdf?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzY2MTZlZGNhLTE3NDMtNDQ5Mi04YWMyLWJkOTAzNDA3YTkyZSJ9.eyJ1cmwiOiJyZXN1bWVkYXRhL01hbGluZ2EgU2FtYXJha29vbi5wZGYiLCJpYXQiOjE3NDcxNjIzOTAsImV4cCI6MTg0MTc3MDM5MH0.h732DqfuTS22Lv6zAEzJgeTbU4rM5yso6SC-952nJRU';
     const link = document.createElement('a');
     link.href = cvUrl;
-    link.download = 'Malinga_CV.pdf'; // Customize the downloaded file name
+    link.download = 'Malinga_CV.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleContactClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    if (modalRef.current) {
+      gsap.to(modalRef.current, {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.3,
+        ease: 'power3.in',
+        onComplete: () => setIsModalOpen(false),
+      });
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Placeholder for form submission logic
+    console.log('Form submitted');
+    handleCloseModal();
   };
 
   return (
@@ -171,9 +228,9 @@ const Hero: React.FC = () => {
           <Button
             ref={buttonRef}
             variant="primary"
-             onClick={handleCvDownload}
+            onClick={handleCvDownload}
             className={`${styles.button} px-8 py-3 text-lg font-semibold rounded-full shadow-lg transition-all duration-300`}
-            aria-label="Enter the Code"
+            aria-label="Download CV"
           >
             View My CV
           </Button>
@@ -197,13 +254,95 @@ const Hero: React.FC = () => {
           <div ref={rippleBottomRight3Ref} className={styles.ripple}></div>
         </div>
         <div className={styles.imageContent}>
-          <img
-            src={Profile}
-            alt="Malinga's Profile"
-            className={styles.profileImage}
-          />
+          <div className={styles.profileImageContainer}>
+            <img
+              src={Profile}
+              alt="Malinga's Profile"
+              className={styles.profileImage}
+            />
+            <button
+              ref={contactButtonRef}
+              className={styles.contactButton}
+              onClick={handleContactClick}
+              aria-label="Open contact form"
+            >
+              <i className="fas fa-envelope"></i>
+            </button>
+          </div>
+          <div className={styles.socialLinksContainer} ref={socialLinksRef}>
+            <h3 className={styles.socialLinksTitle}>Find Me Online</h3>
+            <div className={styles.socialLinks}>
+              {socialLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialLink}
+                  aria-label={`Link to ${link.name} profile`}
+                >
+                  <img src={link.icon} alt={`${link.name} icon`} className={styles.socialIcon} />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+      {/* Contact Modal */}
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal} ref={modalRef}>
+            <button
+              className={styles.closeButton}
+              onClick={handleCloseModal}
+              aria-label="Close contact form"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+            <h2 className={styles.modalTitle}>Contact Me</h2>
+            <form className={styles.contactForm} onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Your Name"
+                  className={styles.formInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="Your Email"
+                  className={styles.formInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="message">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  placeholder="Your Message"
+                  className={styles.formTextarea}
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className={`${styles.submitButton} px-6 py-2 text-lg font-semibold rounded-full`}
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       {/* Skills Section */}
       <div className={styles.skillsSection} ref={skillsSectionRef}>
         <div className={styles.skillsGrid}>

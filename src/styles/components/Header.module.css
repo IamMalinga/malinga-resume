@@ -3,6 +3,7 @@
   --text-color: #2d3748;
   --primary-color: #2563eb;
   --border-color: rgba(0, 0, 0, 0.1);
+  --scroll-bar-color: #2563eb;
 }
 
 [data-theme='dark'] {
@@ -10,6 +11,7 @@
   --text-color: #e2e8f0;
   --primary-color: #60a5fa;
   --border-color: rgba(255, 255, 255, 0.1);
+  --scroll-bar-color: #60a5fa;
 }
 
 .header {
@@ -67,6 +69,15 @@
   color: var(--primary-color);
 }
 
+.scrollBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--scroll-bar-color);
+  transition: width 0.3s ease;
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
@@ -101,5 +112,9 @@
 
   .themeToggle {
     padding: 0.3rem;
+  }
+
+  .scrollBar {
+    height: 3px;
   }
 }

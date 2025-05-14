@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/Header.module.css';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { Sun, Moon, Menu } from 'lucide-react';
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const handleToggle = () => {
     console.log('Toggling theme from', theme);
@@ -17,6 +18,22 @@ const Header: React.FC = () => {
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPosition = window.scrollY;
+      const progress = (scrollPosition / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initialize on mount
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <header className={styles.header}>
@@ -41,6 +58,7 @@ const Header: React.FC = () => {
       >
         {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
       </button>
+      <div className={styles.scrollBar} style={{ width: `${scrollProgress}%` }} />
     </header>
   );
 };
