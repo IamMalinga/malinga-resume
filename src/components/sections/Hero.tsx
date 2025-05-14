@@ -146,6 +146,7 @@ const Hero: React.FC = () => {
         }
       );
     }
+    
 
     return () => {
       tl.kill();
