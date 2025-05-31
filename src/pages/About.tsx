@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/components/About.module.css';
 import profile from '../assets/profile.jpg';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
 import { useTheme } from '../hooks/useTheme';
+import PreloaderComponent from './PreloaderComponent';
 
 const About: React.FC = () => {
   const bioRef = useRef<HTMLDivElement>(null);
@@ -90,6 +91,8 @@ const About: React.FC = () => {
 
     camera.position.z = 50;
 
+    
+
     const animateParticles = () => {
       requestAnimationFrame(animateParticles);
       const positionsAttr = particles.geometry.attributes.position;
@@ -118,6 +121,8 @@ const About: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       renderer.dispose();
     };
+
+
   }, [theme]);
 
   return (
@@ -155,9 +160,6 @@ const About: React.FC = () => {
               <ul className={styles.subList}>
                 <li>Duration: 2021 – 2025 (Expected)</li>
                 <li>Major Coursework: Data Structures, Algorithms, Web Development, Database Systems, Machine Learning, Cloud Computing</li>
-                <li>Achievements: Dean’s List (2022-2023), Best Project Award for Data Quest (2023)</li>
-                <li>Extracurricular: Member of IEEE Student Branch, Organizer of Hackathon 2024</li>
-                <li>Final Year Project: Gym Management System (MERN Stack Implementation)</li>
               </ul>
             </li>
             <li>Certified in Spring Boot 3, IBM DevOps, and Google Cybersecurity Specialization</li>

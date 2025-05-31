@@ -1,34 +1,77 @@
-import React, { useEffect, useRef } from 'react';
-import { type BlogPost } from '../types/blog.ts'; // Ensure src/types/blog.ts exists
-import { formatDate } from '../utils/formatDate.ts'; // Ensure src/utils/formatDate.ts exists
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { type BlogPost } from '../types/blog.ts';
+import { formatDate } from '../utils/formatDate.ts';
 import styles from '../styles/components/Blog.module.css';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
-import { useTheme } from '../hooks/useTheme'; // Assuming this hook exists
+import { useTheme } from '../hooks/useTheme';
+import supabase from '../utils/supabase';
+import PreloaderComponent from './PreloaderComponent.tsx';
 
-// Mock data (replace with API fetch in production)
-const mockPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'Designing for Accessibility',
-    excerpt: 'Learn how to create inclusive designs for all users.',
-    date: '2025-01-15',
-    content: 'Full content here...',
-  },
-  {
-    id: '2',
-    title: 'React Tips and Tricks',
-    excerpt: 'Boost your React skills with these pro tips.',
-    date: '2025-02-10',
-    content: 'Full content here...',
-  },
-];
+const POSTS_PER_PAGE = 6;
 
 const Blog: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const postsRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('posts')
+          .select('id, title, excerpt, date, content, banner_url, category')
+          .order('date', { ascending: false });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setPosts((data as BlogPost[]) || []);
+        setFilteredPosts((data as BlogPost[]) || []);
+        setCategories([
+          ...new Set(
+            ((data as BlogPost[]) || []).map((post: BlogPost) => post.category)
+          ),
+        ]);
+      } catch (err) {
+        setError('Failed to fetch posts. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    // Filter posts by search query and category
+    let filtered = posts;
+    if (searchQuery) {
+      filtered = filtered.filter(
+        post =>
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    if (selectedCategory) {
+      filtered = filtered.filter(post => post.category === selectedCategory);
+    }
+    setFilteredPosts(filtered);
+    setCurrentPage(1); // Reset to first page on filter change
+  }, [searchQuery, selectedCategory, posts]);
 
   useEffect(() => {
     // GSAP animations
@@ -56,32 +99,44 @@ const Blog: React.FC = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    const particleCount = 400;
+    const particleCount = 500;
     const particlesGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount);
+    const colors = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 60;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
       velocities[i] = Math.random() * 0.015 + 0.01;
+
+      if (theme === 'light') {
+        colors[i * 3] = Math.random() * 0.5 + 0.5;
+        colors[i * 3 + 1] = 0;
+        colors[i * 3 + 2] = Math.random() * 0.5 + 0.5;
+      } else {
+        colors[i * 3] = 0;
+        colors[i * 3 + 1] = Math.random() * 0.5 + 0.5;
+        colors[i * 3 + 2] = Math.random() * 0.5 + 0.5;
+      }
     }
 
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particleMaterial = new THREE.PointsMaterial({
-      color: theme === 'light' ? 0xff00cc : 0x00ffcc,
-      size: 0.15,
+      size: 0.2,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.7,
+      vertexColors: true,
     });
 
     const particles = new THREE.Points(particlesGeometry, particleMaterial);
     scene.add(particles);
 
-    camera.position.z = 60;
+    camera.position.z = 50;
 
     const animateParticles = () => {
       requestAnimationFrame(animateParticles);
@@ -113,20 +168,99 @@ const Blog: React.FC = () => {
     };
   }, [theme]);
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleCategoryClick = (category: string | null) => {
+    setSelectedCategory(category);
+  };
+
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
+
+  if (loading) {
+    return <PreloaderComponent />;;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
   return (
     <main className={`${styles.blog} ${theme === 'light' ? styles.light : ''}`}>
       <canvas ref={canvasRef} className={styles.particleCanvas} />
       <h1 ref={titleRef} className={styles.title}>Blog</h1>
-      <div ref={postsRef} className={styles.posts}>
-        {mockPosts.map((post) => (
-          <article key={post.id} className={styles.post}>
-            <h2 className={styles.postTitle}>{post.title}</h2>
-            <p className={styles.date}>{formatDate(post.date)}</p>
-            <p className={styles.excerpt}>{post.excerpt}</p>
-            <a href={`/blog/${post.id}`} className={styles.readMore}>
-              Read More
-            </a>
-          </article>
+      <div className={styles.controls}>
+        <input
+          type="text"
+          placeholder="Search posts..."
+          value={searchQuery}
+          onChange={handleSearch}
+          className={styles.searchBar}
+          aria-label="Search blog posts"
+        />
+        <div className={styles.categories}>
+          <button
+            className={`${styles.categoryButton} ${selectedCategory === null ? styles.active : ''}`}
+            onClick={() => handleCategoryClick(null)}
+            aria-label="Show all categories"
+          >
+            All
+          </button>
+          {categories.map(category => (
+            <button
+              key={category}
+              className={`${styles.categoryButton} ${selectedCategory === category ? styles.active : ''}`}
+              onClick={() => handleCategoryClick(category)}
+              aria-label={`Filter by ${category}`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+<div ref={postsRef} className={styles.posts}>
+  {paginatedPosts.map(post => (
+    <article key={post.id} className={styles.post}>
+      {post.banner_url && (
+        <div className={styles.bannerContainer}>
+          <img
+            src={post.banner_url}
+            alt={`${post.title} banner`}
+            className={styles.bannerImage}
+          />
+          <div className={styles.bannerOverlay}></div>
+        </div>
+      )}
+      <div className={styles.postContent}>
+        <h2 className={styles.postTitle}>{post.title}</h2>
+        <div className={styles.meta}>
+          <p className={styles.date}>{formatDate(post.date)}</p>
+          <span className={styles.categoryBadge}>{post.category}</span>
+        </div>
+        <p className={styles.excerpt}>{post.excerpt}</p>
+        <Link to={`/blog/${post.id}`} className={styles.readMore}>
+          <span>Read More</span>
+          <i className="fas fa-arrow-right"></i>
+        </Link>
+      </div>
+    </article>
+  ))}
+</div>
+      <div className={styles.pagination}>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ''}`}
+            onClick={() => setCurrentPage(i + 1)}
+            aria-label={`Go to page ${i + 1}`}
+          >
+            {i + 1}
+          </button>
         ))}
       </div>
     </main>
