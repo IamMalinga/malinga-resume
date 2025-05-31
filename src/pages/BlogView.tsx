@@ -25,6 +25,58 @@ const BlogView: React.FC = () => {
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
   const [userId, setUserId] = useState<string>('');
 
+  // Function to process plain text content into paragraphs and tables
+  const processContent = (text: string) => {
+    const lines = text.split('\n');
+    const paragraphs: string[] = [];
+    let currentParagraph = '';
+    let isTable = false;
+    let tableRows: string[] = [];
+
+    lines.forEach(line => {
+      line = line.trim();
+      if (line.startsWith('Table')) {
+        if (currentParagraph) paragraphs.push(currentParagraph.trim());
+        currentParagraph = '';
+        isTable = true;
+      } else if (isTable && line) {
+        tableRows.push(line);
+      } else if (line && !isTable) {
+        if (currentParagraph) currentParagraph += ' ';
+        currentParagraph += line;
+      } else if (currentParagraph && !isTable) {
+        paragraphs.push(currentParagraph.trim());
+        currentParagraph = '';
+      }
+    });
+
+    if (currentParagraph) paragraphs.push(currentParagraph.trim());
+
+    const contentElements = [];
+    for (let i = 0; i < paragraphs.length; i++) {
+      contentElements.push(<p key={i}>{paragraphs[i]}</p>);
+    }
+
+    if (tableRows.length > 0) {
+      const headers = tableRows[0].split('|').map(h => h.trim());
+      const rows = tableRows.slice(1).map(row => row.split('|').map(cell => cell.trim()));
+      contentElements.push(
+        <table key="table" className={styles.customTable}>
+          <thead>
+            <tr>{headers.map((header, idx) => <th key={idx}>{header}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIdx) => (
+              <tr key={rowIdx}>{row.map((cell, cellIdx) => <td key={cellIdx}>{cell}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+
+    return contentElements;
+  };
+
   useEffect(() => {
     const initializeUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -271,7 +323,9 @@ const BlogView: React.FC = () => {
                   className={styles.subsection}
                 >
                   <h2 className={styles.subsectionTitle}>{section.title}</h2>
-                  <p className={styles.subsectionBody}>{section.content}</p>
+                  <div className={styles.subsectionBody}>
+                    {processContent(section.content)}
+                  </div>
                   {section.image_url && (
                     <figure className={styles.contentImage}>
                       <img
