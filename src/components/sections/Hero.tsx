@@ -248,11 +248,11 @@ const Hero: React.FC = () => {
   ];
 
   const socialLinks = [
-    { name: 'Email', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg', url: 'mailto:your.email@example.com' },
-    { name: 'LinkedIn', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg', url: 'https://www.linkedin.com/in/yourprofile' },
-    { name: 'StackOverflow', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/stackoverflow.svg', url: 'https://stackoverflow.com/users/yourprofile' },
-    { name: 'HackerRank', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hackerrank.svg', url: 'https://www.hackerrank.com/yourprofile' },
-    { name: 'Dev', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/devdotto.svg', url: 'https://dev.to/yourprofile' },
+    { name: 'Email', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg', url: 'mailto:malinga_samarakoon@outlook.com' },
+    { name: 'LinkedIn', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg', url: 'https://www.linkedin.com/in/malinga-samarakoon-b8333527b/' },
+    { name: 'StackOverflow', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/stackoverflow.svg', url: 'https://stackoverflow.com/users/28654830/user28654830' },
+    { name: 'HackerRank', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hackerrank.svg', url: 'https://www.hackerrank.com/profile/malinga_samarak1' },
+    { name: 'Dev', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/devdotto.svg', url: 'https://dev.to/malinga' },
   ];
 
   const handleCvDownload = () => {

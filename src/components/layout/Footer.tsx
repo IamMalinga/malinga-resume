@@ -59,10 +59,10 @@ const Footer: React.FC = () => {
   return (
     <footer className={styles.footer}>
       <div ref={socialsRef} className={styles.socials}>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <a href="linkedin.com/in/malinga-samarakoon-b8333527b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
           <i className="fab fa-linkedin"></i>
         </a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <a href="https://github.com/IamMalinga" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
           <i className="fab fa-github"></i>
         </a>
         <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
