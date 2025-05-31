@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from '../styles/components/About.module.css';
 import profile from '../assets/profile.jpg';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
 import { useTheme } from '../hooks/useTheme';
-import PreloaderComponent from './PreloaderComponent';
+
 
 const About: React.FC = () => {
   const bioRef = useRef<HTMLDivElement>(null);

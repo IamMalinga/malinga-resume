@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, BrowserRouter as Router, useLocation } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom'; // Removed unused 'Router' alias
 import { ThemeProvider } from './context/ThemeContext';
 import { ProjectProvider } from './context/ProjectContext';
 import Header from './components/layout/Header';
@@ -7,8 +7,7 @@ import Footer from './components/layout/Footer';
 import AppRoutes from './routes';
 import './styles/global.css';
 import { initGA, logPageView } from './utils/analytics';
-import supabase from './utils/supabase'; // Import Supabase client
-
+import supabase from './utils/supabase';
 
 // Component to handle dynamic title
 const TitleUpdater: React.FC = () => {
@@ -26,6 +25,7 @@ const TitleUpdater: React.FC = () => {
 
   useEffect(() => {
     let pageTitle = baseTitle;
+    console.log(postTitle);
 
     // Handle blog post pages
     const blogPostIdMatch = location.pathname.match(/^\/blog\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
