@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../../styles/components/Header.module.css';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
-import { Sun, Moon, Menu } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
     console.log('Toggling theme from', theme);
@@ -17,6 +18,12 @@ const Header: React.FC = () => {
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleCloseMenu = () => {
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -35,8 +42,21 @@ const Header: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node) && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <header className={styles.header}>
+    <header ref={headerRef} className={styles.header}>
       <Link to="/" className={styles.logo}>
         Samarakoon M.
       </Link>
@@ -49,6 +69,13 @@ const Header: React.FC = () => {
         <Menu size={24} />
       </button>
       <nav className={`${styles.navbar} ${isMobileMenuOpen ? styles.mobileOpen : ''}`}>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseMenu}
+          aria-label="Close mobile menu"
+        >
+          <X size={24} />
+        </button>
         <Navbar />
       </nav>
       <button

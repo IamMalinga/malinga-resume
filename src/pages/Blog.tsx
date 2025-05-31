@@ -97,9 +97,11 @@ const Blog: React.FC = () => {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
 
-    const particleCount = 500;
+    // Adjust particle count based on screen size
+    const isMobile = window.innerWidth <= 768;
+    const particleCount = isMobile ? 200 : 500; // Reduce particles on mobile
     const particlesGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount);
@@ -183,7 +185,7 @@ const Blog: React.FC = () => {
   );
 
   if (loading) {
-    return <PreloaderComponent />;;
+    return <PreloaderComponent />;
   }
 
   if (error) {
@@ -223,34 +225,34 @@ const Blog: React.FC = () => {
           ))}
         </div>
       </div>
-<div ref={postsRef} className={styles.posts}>
-  {paginatedPosts.map(post => (
-    <article key={post.id} className={styles.post}>
-      {post.banner_url && (
-        <div className={styles.bannerContainer}>
-          <img
-            src={post.banner_url}
-            alt={`${post.title} banner`}
-            className={styles.bannerImage}
-          />
-          <div className={styles.bannerOverlay}></div>
-        </div>
-      )}
-      <div className={styles.postContent}>
-        <h2 className={styles.postTitle}>{post.title}</h2>
-        <div className={styles.meta}>
-          <p className={styles.date}>{formatDate(post.date)}</p>
-          <span className={styles.categoryBadge}>{post.category}</span>
-        </div>
-        <p className={styles.excerpt}>{post.excerpt}</p>
-        <Link to={`/blog/${post.id}`} className={styles.readMore}>
-          <span>Read More</span>
-          <i className="fas fa-arrow-right"></i>
-        </Link>
+      <div ref={postsRef} className={styles.posts}>
+        {paginatedPosts.map(post => (
+          <article key={post.id} className={styles.post}>
+            {post.banner_url && (
+              <div className={styles.bannerContainer}>
+                <img
+                  src={post.banner_url}
+                  alt={`${post.title} banner`}
+                  className={styles.bannerImage}
+                />
+                <div className={styles.bannerOverlay}></div>
+              </div>
+            )}
+            <div className={styles.postContent}>
+              <h2 className={styles.postTitle}>{post.title}</h2>
+              <div className={styles.meta}>
+                <p className={styles.date}>{formatDate(post.date)}</p>
+                <span className={styles.categoryBadge}>{post.category}</span>
+              </div>
+              <p className={styles.excerpt}>{post.excerpt}</p>
+              <Link to={`/blog/${post.id}`} className={styles.readMore}>
+                <span>Read More</span>
+                <i className="fas fa-arrow-right"></i>
+              </Link>
+            </div>
+          </article>
+        ))}
       </div>
-    </article>
-  ))}
-</div>
       <div className={styles.pagination}>
         {Array.from({ length: totalPages }, (_, i) => (
           <button

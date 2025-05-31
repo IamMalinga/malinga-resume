@@ -28,6 +28,7 @@ export type Education = {
 };
 
 export type Project = {
+  category: string;
   id: number;
   title: string;
   start_date?: string;
