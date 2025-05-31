@@ -1,55 +1,135 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/components/Portfolio.module.css';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
 import { useTheme } from '../hooks/useTheme';
+import supabase from '../utils/supabase';
+import { type Basics, type Work, type Education, type Project, type Skill, type Course } from '../types/portfolio';
+import PreloaderComponent from './PreloaderComponent';
 
 const Portfolio: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const basicsRef = useRef<HTMLDivElement>(null);
-  const workRef = useRef<HTMLDivElement>(null);
-  const educationRef = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
-  const skillsRef = useRef<HTMLDivElement>(null);
-  const coursesRef = useRef<HTMLDivElement>(null);
+  const basicsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const workRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const educationRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const projectsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const skillsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const coursesRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const { theme } = useTheme();
   const sectionRefs = [basicsRef, workRef, educationRef, projectsRef, skillsRef, coursesRef];
   const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  useEffect(() => {
-    // GSAP animations
-    gsap.fromTo(
-      basicsRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
-    );
-    gsap.fromTo(
-      workRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.2 }
-    );
-    gsap.fromTo(
-      educationRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.4 }
-    );
-    gsap.fromTo(
-      projectsRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.6 }
-    );
-    gsap.fromTo(
-      skillsRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.8 }
-    );
-    gsap.fromTo(
-      coursesRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 1.0 }
-    );
+  const [basics, setBasics] = useState<Basics | null>(null);
+  const [work, setWork] = useState<Work[]>([]);
+  const [education, setEducation] = useState<Education[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState({
+    basics: false,
+    work: false,
+    education: false,
+    projects: false,
+    skills: false,
+    courses: false,
+  });
+  const [skillFilter, setSkillFilter] = useState<string>('All');
 
-    // Three.js particle background
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch Basics
+        const { data: basicsData, error: basicsError } = await supabase
+          .from('basics')
+          .select('*')
+          .maybeSingle();
+        if (basicsError) throw new Error(`Basics fetch error: ${basicsError.message}`);
+        setBasics(basicsData);
+
+        // Fetch Work
+        const { data: workData, error: workError } = await supabase
+          .from('work')
+          .select('*')
+          .order('start_date', { ascending: false });
+        if (workError) throw new Error(`Work fetch error: ${workError.message}`);
+        const parsedWork = workData?.map(job => ({
+          ...job,
+          responsibilities: job.responsibilities.map((item: string) => JSON.parse(item))
+        })) || [];
+        setWork(parsedWork);
+
+        // Fetch Education
+        const { data: educationData, error: educationError } = await supabase
+          .from('education')
+          .select('*')
+          .order('start_date', { ascending: false });
+        if (educationError) throw new Error(`Education fetch error: ${educationError.message}`);
+        setEducation(educationData || []);
+
+        // Fetch Projects
+        const { data: projectsData, error: projectsError } = await supabase
+          .from('projects')
+          .select('*')
+          .order('start_date', { ascending: false });
+        if (projectsError) throw new Error(`Projects fetch error: ${projectsError.message}`);
+        const parsedProjects = projectsData?.map(project => ({
+          ...project,
+          description: project.description.map((item: string) => JSON.parse(item))
+        })) || [];
+        setProjects(parsedProjects);
+
+        // Fetch Skills
+        const { data: skillsData, error: skillsError } = await supabase
+          .from('skills')
+          .select('*');
+        if (skillsError) throw new Error(`Skills fetch error: ${skillsError.message}`);
+        setSkills(skillsData || []);
+
+        // Fetch Courses
+        const { data: coursesData, error: coursesError } = await supabase
+          .from('courses')
+          .select('*')
+          .order('start_date', { ascending: false });
+        if (coursesError) throw new Error(`Courses fetch error: ${coursesError.message}`);
+        setCourses(coursesData || []);
+
+      } catch (err: any) {
+        setError(`Failed to fetch data: ${err.message}`);
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (loading || error) return;
+
+    const animateSection = (ref: React.RefObject<HTMLDivElement>, delay: number) => {
+      if (ref.current) {
+        gsap.fromTo(
+          ref.current,
+          { opacity: 0, y: 50 },
+          { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay }
+        );
+      }
+    };
+
+    animateSection(basicsRef, 0);
+    animateSection(workRef, 0.2);
+    animateSection(educationRef, 0.4);
+    animateSection(projectsRef, 0.6);
+    animateSection(skillsRef, 0.8);
+    animateSection(coursesRef, 1.0);
+  }, [loading, error]);
+
+  useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -122,7 +202,6 @@ const Portfolio: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Scroll tracking for navigation
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -134,7 +213,7 @@ const Portfolio: React.FC = () => {
           }
         });
       },
-      { threshold: 0.5 } // Trigger when 50% of the section is visible
+      { threshold: 0.5 }
     );
 
     sectionRefs.forEach((ref) => {
@@ -149,277 +228,258 @@ const Portfolio: React.FC = () => {
   }, [theme]);
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const toggleSection = (section: keyof typeof collapsedSections) => {
+    setCollapsedSections(prev => {
+      const newState = { ...prev, [section]: !prev[section] };
+      const refMap: { [key: string]: React.RefObject<HTMLDivElement> } = {
+        basics: basicsRef,
+        work: workRef,
+        education: educationRef,
+        projects: projectsRef,
+        skills: skillsRef,
+        courses: coursesRef,
+      };
+      const ref = refMap[section];
       if (ref.current) {
-        ref.current.scrollIntoView({ behavior: 'smooth' });
+        if (newState[section]) {
+          gsap.to(ref.current.querySelector(`.${styles.details}`), {
+            height: 0,
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power3.inOut',
+          });
+        } else {
+          gsap.to(ref.current.querySelector(`.${styles.details}`), {
+            height: 'auto',
+            opacity: 1,
+            duration: 0.5,
+            ease: 'power3.inOut',
+          });
+        }
       }
-    };
+      return newState;
+    });
+  };
+
+  const skillCategories = ['All', ...new Set(skills.map(skill => skill.category))];
+  const filteredSkills = skillFilter === 'All' ? skills : skills.filter(skill => skill.category === skillFilter);
+
+  if (loading) {
+    return <PreloaderComponent />;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
 
   return (
     <main className={styles.portfolio} data-theme={theme}>
       <canvas ref={canvasRef} className={styles.particleCanvas} />
       <nav className={styles.navBar}>
         <ul className={styles.navList}>
-          <li>
-            <a
-              href="#basics"
-              ref={(el) => {
-                navItemsRef.current[0] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(basicsRef);
-              }}
-            >
-              Basics
-            </a>
-          </li>
-          <li>
-            <a
-              href="#work"
-              ref={(el) => {
-                navItemsRef.current[1] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(workRef);
-              }}
-            >
-              Work
-            </a>
-          </li>
-          <li>
-            <a
-              href="#education"
-              ref={(el) => {
-                navItemsRef.current[2] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(educationRef);
-              }}
-            >
-              Education
-            </a>
-          </li>
-          <li>
-            <a
-              href="#projects"
-              ref={(el) => {
-                navItemsRef.current[3] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(projectsRef);
-              }}
-            >
-              Projects
-            </a>
-          </li>
-          <li>
-            <a
-              href="#skills"
-              ref={(el) => {
-                navItemsRef.current[4] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(skillsRef);
-              }}
-            >
-              Skills
-            </a>
-          </li>
-          <li>
-            <a
-              href="#courses"
-              ref={(el) => {
-                navItemsRef.current[5] = el;
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(coursesRef);
-              }}
-            >
-              Courses
-            </a>
-          </li>
+          {['Basics', 'Work', 'Education', 'Projects', 'Skills', 'Courses'].map((section, index) => (
+            <li key={section}>
+              <a
+                href={`#${section.toLowerCase()}`}
+                ref={el => { navItemsRef.current[index] = el; }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(sectionRefs[index]);
+                }}
+              >
+                {section}
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
       <div className={styles.resume}>
+       
+
         {/* Basics Section */}
         <div ref={basicsRef} id="basics" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Basics</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('basics')}>
+            Basics {collapsedSections.basics ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <p><strong>Name:</strong> Malinga Samarakoon</p>
-            <p><strong>Label:</strong> Software Engineer</p>
-            <p><strong>Email:</strong> <a href="mailto:malinga_samarakoon@outlook.com">malinga_samarakoon@outlook.com</a></p>
-            <p><strong>URL:</strong> <a href="https://github.com/lamMalinga" target="_blank" rel="noopener noreferrer">https://github.com/lamMalinga</a></p>
+            {basics ? (
+              <>
+                <p><strong>Name:</strong> {basics.name}</p>
+                <p><strong>Label:</strong> {basics.label}</p>
+                <p><strong>Email:</strong> <a href={`mailto:${basics.email}`}>{basics.email}</a></p>
+                <p><strong>URL:</strong> <a href={basics.url} target="_blank" rel="noopener noreferrer">{basics.url}</a></p>
+                {basics.social_links && (
+                  <div className={styles.socialLinks}>
+                    {basics.social_links.linkedin && (
+                      <a href={basics.social_links.linkedin} target="_blank" rel="noopener noreferrer">
+                        LinkedIn
+                      </a>
+                    )}
+                    {basics.social_links.github && (
+                      <a href={basics.social_links.github} target="_blank" rel="noopener noreferrer">
+                        GitHub
+                      </a>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p>No basics information available.</p>
+            )}
           </div>
         </div>
 
         {/* Work Section */}
         <div ref={workRef} id="work" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Work</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('work')}>
+            Work {collapsedSections.work ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <div className={styles.job}>
-              <span className={styles.date}>2022 - Present</span>
-              <strong>Freelancing Web Developer</strong> | Sri Lanka
-              <ul className={styles.jobList}>
-                <li>Developed and maintained responsive web applications using React, Angular, and the MERN stack for various clients.</li>
-                <li>Designed backend solutions with Node.js, Express.js, MongoDB, and MySQL, focusing on scalability and security.</li>
-                <li>Collaborated with clients to gather requirements, provide technical consultations, and deliver customized solutions.</li>
-                <li>Integrated APIs and third-party services like Firebase to enhance application functionality.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>2022 - 2023</span>
-              <strong>University of Peradeniya | Designer of Science Reporter</strong> | Peradeniya, Sri Lanka
-              <ul className={styles.jobList}>
-                <li>Designed content for the Science Reporter, contributing to the university's science communication efforts.</li>
-                <li>Collaborated with the Science Student Union as a former designer, enhancing visual materials for events.</li>
-              </ul>
-            </div>
+            {work.length > 0 ? (
+              work.map((job) => (
+                <div key={job.id} className={styles.job}>
+                  <span className={styles.date}>
+                    {job.start_date ? new Date(job.start_date).getFullYear() : ''} -{' '}
+                    {job.end_date ? new Date(job.end_date).getFullYear() : 'Present'}
+                  </span>
+                  <strong>{job.title} {job.company ? `| ${job.company}` : ''}</strong> {job.location ? `| ${job.location}` : ''}
+                  {Array.isArray(job.responsibilities) && job.responsibilities.length > 0 ? (
+                    <ul className={styles.jobList}>
+                      {job.responsibilities.map((task, index) => (
+                        <li key={index}>{task.text || `Responsibility ${index + 1} unavailable`}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No responsibilities listed.</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No work experience available.</p>
+            )}
           </div>
         </div>
 
         {/* Education Section */}
         <div ref={educationRef} id="education" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Education</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('education')}>
+            Education {collapsedSections.education ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <div className={styles.educationItem}>
-              <strong>University of Peradeniya | BSc (Hons) in Computer Science</strong>
-              <p>In Progress | Peradeniya, Sri Lanka | Expected 2025</p>
-              <p>Coursework: Object-oriented Programming (Java), Data Structures (Java), Database Management Systems, Computer Architecture, Web Programming I, Operating Systems Concepts, Computer Graphics, Object Oriented Analysis and Design, Server Side Web Programming, Software Engineering, Digital Image Processing, Design and Analysis of Algorithms, Artificial Intelligence, Advanced Computer Networks, Distributed Computing, Computer Vision, Neural Networks and Deep Learning, Software Project Management, Machine Learning</p>
-            </div>
-            <div className={styles.educationItem}>
-              <strong>ST. Thomas' College Matara | GCE Advanced Level</strong>
-              <p>2019 | Matara, Sri Lanka</p>
-              <p>Stream - Biological Science | Z-Score - 1.3904 | Rank - 136</p>
-            </div>
+            {education.length > 0 ? (
+              education.map((edu) => (
+                <div key={edu.id} className={styles.educationItem}>
+                  <strong>{edu.institution} | {edu.degree}</strong>
+                  <p>
+                    {edu.start_date ? new Date(edu.start_date).getFullYear() : ''} -{' '}
+                    {edu.end_date ? new Date(edu.end_date).getFullYear() : 'In Progress'} {edu.location ? `| ${edu.location}` : ''}
+                  </p>
+                  {edu.description && <p>{edu.description}</p>}
+                </div>
+              ))
+            ) : (
+              <p>No education information available.</p>
+            )}
           </div>
         </div>
 
         {/* Projects Section */}
         <div ref={projectsRef} id="projects" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Projects</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('projects')}>
+            Projects {collapsedSections.projects ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <div className={styles.job}>
-              <span className={styles.date}>Aug 2024 - Oct 2024</span>
-              <strong>Data Quest | Interactive Data Collection System</strong> | Peradeniya, Sri Lanka
-              <ul className={styles.jobList}>
-                <li>Built a system for 200 users at the Faculty of Management using React.js and Firebase.</li>
-                <li>Streamlined data collection with secure authentication and efficient database management.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Mar 2024 - Jun 2024</span>
-              <strong>Gym Management System | Web-Based Application</strong>
-              <ul className={styles.jobList}>
-                <li>Developed a system using PHP, MySQL, HTML, Bootstrap, and JavaScript for gym operations.</li>
-                <li>Features include member registration, progress tracking, and admin dashboards for reports.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Mar 2024 - Jun 2024</span>
-              <strong>Tutor's MERN Exam Records Portal | Student Management System</strong>
-              <ul className={styles.jobList}>
-                <li>Created a MERN-based portal with role-based authentication, OTP verification, and automated Z-score calculation.</li>
-                <li>Included features like PDF result generation, blog platform, and video class system with payment integration.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Apr 2024 - May 2024</span>
-              <strong>Malicious File Blocker | Chrome Extension</strong>
-              <ul className={styles.jobList}>
-                <li>Designed a Chrome extension to scan and block malicious file downloads in real-time.</li>
-                <li>Integrated with a backend service to enhance user security during internet browsing.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Apr 2024 - May 2024</span>
-              <strong>Todo Master | Task Management Mobile App</strong>
-              <ul className={styles.jobList}>
-                <li>Developed an Android app using Java and Firebase with features like task creation and reminders.</li>
-                <li>Implemented user authentication, data persistence, and dark mode support for better usability.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Jan 2024 - Feb 2024</span>
-              <strong>Real-Time Weather App | Angular-Based Application</strong>
-              <ul className={styles.jobList}>
-                <li>Built a weather app using Angular, integrating the OpenWeather API for real-time data.</li>
-                <li>Delivered accurate temperature, conditions, and forecasts with a seamless user experience.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>Jan 2023 - Mar 2023</span>
-              <strong>Event Registration System | Sinhala and Tamil New Year Games</strong> | Peradeniya, Sri Lanka
-              <ul className={styles.jobList}>
-                <li>Developed a web app using the MERN stack with JWT authentication for event registration.</li>
-                <li>Independently managed the project, showcasing skills in full-stack development and scalable solutions.</li>
-              </ul>
-            </div>
-            <div className={styles.job}>
-              <span className={styles.date}>2023 - 2024</span>
-              <strong>DevOps Capstone Project | IBM Certification Project</strong>
-              <ul className={styles.jobList}>
-                <li>Designed and deployed a full-stack website to the cloud using Docker, Kubernetes, and Openshift.</li>
-                <li>Gained expertise in DevOps, Agile methodologies, and application security enhancement.</li>
-              </ul>
-            </div>
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <div key={project.id} className={styles.job}>
+                  <span className={styles.date}>
+                    {project.start_date ? `${new Date(project.start_date).toLocaleString('default', { month: 'short' })} ${new Date(project.start_date).getFullYear()}` : ''} -{' '}
+                    {project.end_date ? `${new Date(project.end_date).toLocaleString('default', { month: 'short' })} ${new Date(project.end_date).getFullYear()}` : 'Present'}
+                  </span>
+                  {project.url ? (
+                    <strong>
+                      <a href={project.url} target="_blank" rel="noopener noreferrer">{project.title}</a>
+                    </strong>
+                  ) : (
+                    <strong>{project.title}</strong>
+                  )}
+                  {project.location ? ` | ${project.location}` : ''}
+                  {Array.isArray(project.description) && project.description.length > 0 ? (
+                    <ul className={styles.jobList}>
+                      {project.description.map((task, index) => (
+                        <li key={index}>{task.text || `Description ${index + 1} unavailable`}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No project description available.</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No projects available.</p>
+            )}
           </div>
         </div>
 
         {/* Skills Section */}
         <div ref={skillsRef} id="skills" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Skills</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('skills')}>
+            Skills {collapsedSections.skills ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <div className={styles.skillCategory}>
-              <strong>Languages:</strong> JavaScript, Java, Python, C, C++, PHP, SQL
-            </div>
-            <div className={styles.skillCategory}>
-              <strong>Technologies & Libraries:</strong> React, Angular, Spring Boot, Node.js, React Native, Flask
-            </div>
-            <div className={styles.skillCategory}>
-              <strong>Concepts & Methodologies:</strong> Full-Stack Development, DevOps Practices, Web Security, Agile Development, API Integration, Database Management
-            </div>
+            {skills.length > 0 ? (
+              <>
+                <div className={styles.skillFilter}>
+                  <label>Filter by Category: </label>
+                  <select value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)}>
+                    {skillCategories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+                {filteredSkills.map((skill) => (
+                  <div key={skill.id} className={styles.skillCategory}>
+                    <strong>{skill.category}:</strong> {skill.items.join(', ')}
+                  </div>
+                ))}
+              </>
+            ) : (
+              <p>No skills available.</p>
+            )}
           </div>
         </div>
 
         {/* Courses and Certifications Section */}
         <div ref={coursesRef} id="courses" className={styles.card}>
-          <h2 className={styles.sectionTitle}>Courses and Certifications</h2>
+          <h2 className={styles.sectionTitle} onClick={() => toggleSection('courses')}>
+            Courses and Certifications {collapsedSections.courses ? '▼' : '▲'}
+          </h2>
           <div className={styles.details}>
-            <div className={styles.course}>
-              <strong>AWS Academy Cloud Foundations</strong>
-              <p>Aug 2024 - Dec 2024 | University of Moratuwa, Sri Lanka</p>
-              <p>Studying cloud computing fundamentals, including AWS services, architecture, and security.</p>
-            </div>
-            <div className={styles.course}>
-              <strong>Cisco CyberOps Associate</strong>
-              <p>Sep 2024 - Mar 2025 | University of Moratuwa, Sri Lanka</p>
-              <p>Learning cybersecurity operations, threat analysis, and incident response techniques.</p>
-            </div>
-            <div className={styles.course}>
-              <strong>Spring Boot 3, Spring 6 & Hibernate</strong>
-              <p>Completed 2024 | Coursera</p>
-            </div>
-            <div className={styles.course}>
-              <strong>IBM DevOps and Software Engineering</strong>
-              <p>Completed 2023 | Coursera</p>
-            </div>
-            <div className={styles.course}>
-              <strong>Google Cybersecurity Specialization</strong>
-              <p>Completed 2024 | Coursera</p>
-            </div>
-            <div className={styles.course}>
-              <strong>IoT Programming Specialization</strong>
-              <p>Completed 2024 | Coursera</p>
-            </div>
-            <div className={styles.course}>
-              <strong>IBM Machine Learning Specialization</strong>
-              <p>Completed 2024 | Coursera</p>
-            </div>
+            {courses.length > 0 ? (
+              courses.map((course) => (
+                <div key={course.id} className={styles.course}>
+                  <strong>{course.title}</strong>
+                  <p>
+                    {course.start_date && course.end_date
+                      ? `${new Date(course.start_date).toLocaleString('default', { month: 'short' })} ${new Date(course.start_date).getFullYear()} - ${new Date(course.end_date).toLocaleString('default', { month: 'short' })} ${new Date(course.end_date).getFullYear()}`
+                      : 'Completed ' + (course.start_date ? new Date(course.start_date).getFullYear() : '')} | {course.institution}
+                  </p>
+                  {course.description && <p>{course.description}</p>}
+                  {course.certificate_url && (
+                    <a href={course.certificate_url} target="_blank" rel="noopener noreferrer" className={styles.certificateLink}>
+                      View Certificate
+                    </a>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No courses available.</p>
+            )}
           </div>
         </div>
       </div>

@@ -9,6 +9,9 @@
   --nav-hover-color: #1d4ed8;
   --nav-line-color: #2563eb;
   --nav-marker-bg: #2563eb;
+  --button-bg: #2563eb;
+  --button-text: #fff;
+  --button-hover-bg: #1d4ed8;
 }
 
 [data-theme='dark'] {
@@ -22,6 +25,9 @@
   --nav-hover-color: #3b82f6;
   --nav-line-color: #60a5fa;
   --nav-marker-bg: #60a5fa;
+  --button-bg: #60a5fa;
+  --button-text: #fff;
+  --button-hover-bg: #3b82f6;
 }
 
 .portfolio {
@@ -33,7 +39,7 @@
   font-family: var(--font-family);
   overflow: hidden;
   transition: all 0.3s ease;
-  padding-left: 200px; /* Increased to accommodate rotated text */
+  padding-left: 200px;
 }
 
 .particleCanvas {
@@ -113,7 +119,6 @@
   font-size: 1rem;
   font-weight: 500;
   transition: color 0.3s ease;
-
   transform-origin: left center;
   white-space: nowrap;
 }
@@ -168,6 +173,7 @@
   position: relative;
   z-index: 2;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .sectionTitle::after {
@@ -195,6 +201,7 @@
 
 .details {
   padding-left: 1rem;
+  overflow: hidden;
 }
 
 p {
@@ -244,10 +251,83 @@ a:hover {
   transition: color 0.3s ease;
 }
 
+.socialLinks {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.socialLinks a {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: var(--button-text);
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.socialLinks a:hover {
+  background: var(--button-hover-bg);
+  text-decoration: none;
+}
+
+.skillFilter {
+  margin-bottom: 1rem;
+}
+
+.skillFilter label {
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.skillFilter select {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--primary-color);
+  background: var(--secondary-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.certificateLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.certificateLink:hover {
+  background: var(--button-hover-bg);
+  text-decoration: none;
+}
+
+.downloadButton {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.downloadLink {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.downloadLink:hover {
+  background: var(--button-hover-bg);
+  text-decoration: none;
+}
+
 @media (max-width: 768px) {
   .portfolio {
     padding: 20px;
-    padding-left: 20px; /* Adjust for smaller screens */
+    padding-left: 20px;
   }
 
   .navBar {
@@ -272,7 +352,7 @@ a:hover {
   }
 
   .navList::before {
-    display: none; /* Hide vertical line on mobile */
+    display: none;
   }
 
   .navList li {
@@ -280,12 +360,12 @@ a:hover {
   }
 
   .navList li::before {
-    display: none; /* Hide markers on mobile */
+    display: none;
   }
 
   .navList a {
     margin-left: 0;
-    transform: none; /* Remove rotation on mobile */
+    transform: none;
     font-size: 0.8rem;
     padding: 0.5rem;
   }
@@ -304,5 +384,15 @@ a:hover {
 
   .particleCanvas {
     display: none;
+  }
+
+  .socialLinks {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .downloadLink {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }

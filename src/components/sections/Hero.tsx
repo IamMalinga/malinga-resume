@@ -4,6 +4,9 @@ import Button from '../common/Button';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Profile from '../../assets/profile.jpg'; // Replace with your actual profile image path
+import { FaTools } from 'react-icons/fa'; // You can choose any icon
+import * as THREE from 'three';
+import { useTheme } from '../../hooks/useTheme';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,6 +36,11 @@ const Hero: React.FC = () => {
   // State for modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const { theme } = useTheme();
+
+
+
   useEffect(() => {
     // GSAP animation for text, button, and contact button on load
     const tl = gsap.timeline();
@@ -45,7 +53,7 @@ const Hero: React.FC = () => {
 
     tl.fromTo(
       titleRef.current!.querySelectorAll(`.${styles.char}`),
-      { opacity: 0, y: 20, scale: 0.8, rotateX: 90 },
+      { opacity: 0, y: 20, scale: 0.9, rotateX: 90 },
       { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 1.5, stagger: 0.07, ease: 'power3.out' }
     )
       .fromTo(
@@ -57,7 +65,7 @@ const Hero: React.FC = () => {
       .fromTo(
         buttonRef.current,
         { opacity: 0, scale: 0.5, rotateY: 180 },
-        { opacity: 1, scale: 1, rotateY: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' },
+        { opacity: 1, scale: 1, rotateY: 0, duration: 1.5, ease: 'elastic.out(1, 0.5)' },
         '-=0.5'
       )
       .fromTo(
@@ -77,10 +85,80 @@ const Hero: React.FC = () => {
     if (isModalOpen && modalRef.current) {
       gsap.fromTo(
         modalRef.current,
-        { opacity: 0, scale: 0.8 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: 'power3.out' }
+        { opacity: 0, scale: 0.2 },
+        { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }
       );
     }
+
+
+     if (!canvasRef.current) return;
+    
+        const canvas = canvasRef.current;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+    
+        const particleCount = 500; // Increased for more depth
+        const particlesGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount);
+        const colors = new Float32Array(particleCount * 6); // Add color variation
+    
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 60;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+          velocities[i] = Math.random() * 0.015 + 0.01;
+    
+          // Color gradient based on theme
+          if (theme === 'light') {
+            colors[i * 3] = Math.random() * 0.5 + 0.5; // R (pinkish tones)
+            colors[i * 3 + 1] = 0; // G
+            colors[i * 3 + 2] = Math.random() * 0.5 + 0.5; // B
+          } else {
+            colors[i * 3] = 0; // R
+            colors[i * 3 + 1] = Math.random() * 0.5 + 0.5; // G (cyan tones)
+            colors[i * 3 + 2] = Math.random() * 0.5 + 0.5; // B
+          }
+        }
+    
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+        const particleMaterial = new THREE.PointsMaterial({
+          size: 0.2,
+          transparent: true,
+          opacity: 0.9,
+          vertexColors: true, // Enable vertex colors for gradient effect
+        });
+    
+        const particles = new THREE.Points(particlesGeometry, particleMaterial);
+        scene.add(particles);
+    
+        camera.position.z = 50;
+    
+        const animateParticles = () => {
+          requestAnimationFrame(animateParticles);
+          const positionsAttr = particles.geometry.attributes.position;
+          const array = positionsAttr.array as Float32Array;
+    
+          for (let i = 0; i < particleCount; i++) {
+            array[i * 3 + 1] -= velocities[i];
+            if (array[i * 3 + 1] < -30) array[i * 3 + 1] += 60;
+          }
+    
+          positionsAttr.needsUpdate = true;
+          renderer.render(scene, camera);
+        };
+    
+        animateParticles();
+    
+
+
+
 
     // Ripple animation function
     const rippleAnimation = (ripple: HTMLDivElement | null, delay: number) => {
@@ -89,7 +167,7 @@ const Hero: React.FC = () => {
           ripple,
           { scale: 0, opacity: 0.5 },
           {
-            scale: 1.5,
+            scale: 2.5,
             opacity: 0,
             duration: 3,
             ease: 'power1.out',
@@ -146,7 +224,7 @@ const Hero: React.FC = () => {
         }
       );
     }
-    
+
 
     return () => {
       tl.kill();
@@ -212,6 +290,7 @@ const Hero: React.FC = () => {
 
   return (
     <section className={styles.hero} ref={heroRef} aria-label="Hero Section with Profile Introduction">
+      <canvas ref={canvasRef} className={styles.particleCanvas} />
       <div className={styles.heroContainer}>
         <div className={styles.textContent}>
           <h1
@@ -346,10 +425,16 @@ const Hero: React.FC = () => {
       )}
       {/* Skills Section */}
       <div className={styles.skillsSection} ref={skillsSectionRef}>
+        <h2 className={styles.skillsTitle}><FaTools className={styles.skillsIcon} />Tech Toolbox</h2>
         <div className={styles.skillsGrid}>
           {skills.map((skill, index) => (
             <div key={index} className={styles.skillCard}>
-              <img src={skill.icon} alt={`${skill.name} icon`} className={styles.skillIcon} />
+              <div className={styles.skillCardInner}>
+                <img src={skill.icon} alt={`${skill.name} icon`} className={styles.skillIcon} />
+                <div className={styles.skillOverlay}>
+                  <span className={styles.skillName}>{skill.name}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
