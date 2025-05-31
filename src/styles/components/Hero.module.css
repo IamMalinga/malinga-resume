@@ -739,8 +739,8 @@
 
   .profileImage {
     display: block;
-    width: 250px;
-    height: 250px;
+    width: 300px;
+    height: 300px;
   }
 
   .contactButton {
@@ -854,5 +854,22 @@
 
   .skillName {
     font-size: 0.9rem;
+  }
+
+  .imageContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .socialLinks {
+    display: flex;
+    flex-flow: row;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
 }

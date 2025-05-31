@@ -26,6 +26,7 @@ const Footer: React.FC = () => {
       link.addEventListener('mouseenter', () => {
         gsap.to(link, {
           scale: 1.2,
+          rotate: 5,
           color: 'var(--secondary-color)',
           duration: 0.3,
           ease: 'power2.out',
@@ -34,6 +35,7 @@ const Footer: React.FC = () => {
       link.addEventListener('mouseleave', () => {
         gsap.to(link, {
           scale: 1,
+          rotate: 0,
           color: 'var(--primary-color)',
           duration: 0.3,
           ease: 'power2.out',

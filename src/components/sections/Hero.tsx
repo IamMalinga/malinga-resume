@@ -333,6 +333,8 @@ const Hero: React.FC = () => {
           <div ref={rippleBottomRight2Ref} className={styles.ripple}></div>
           <div ref={rippleBottomRight3Ref} className={styles.ripple}></div>
         </div>
+        <div className={styles.profileSection}>
+          
         <div className={styles.imageContent}>
           <div className={styles.profileImageContainer}>
             <img
@@ -366,6 +368,7 @@ const Hero: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
         </div>
       </div>
       {/* Contact Modal */}

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { type BlogPost, type Comment } from '../types/blog.ts';
 import { formatDate } from '../utils/formatDate.ts';
-import styles from '../styles/components/Blog.module.css';
+import styles from '../styles/components/BlogView.module.css';
 import supabase from '../utils/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { gsap } from 'gsap';
@@ -130,8 +130,6 @@ const BlogView: React.FC = () => {
       }
     };
 
-    console.log('Scroll progress:', progress);
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [post]);
@@ -222,6 +220,7 @@ const BlogView: React.FC = () => {
 
   return (
     <main className={`${styles.blog} ${theme === 'light' ? styles.light : ''}`}>
+      <div className={styles.progressBar} style={{ width: `${progress}%` }} />
       <div className={styles.postViewContainer}>
         <nav className={`${styles.navMenu} ${isTocOpen ? styles.open : ''}`}>
           <button
@@ -257,95 +256,95 @@ const BlogView: React.FC = () => {
             />
           )}
           <div className={styles.content}>
-          <h1 className={styles.postTitle}>{post.title}</h1>
-          <div className={styles.meta}>
-            <p className={styles.date}>{formatDate(post.date)}</p>
-            <span className={styles.categoryBadge}>{post.category}</span>
-          </div>
-          <div className={styles.content}>
-            {subsections.map((section, index) => (
-              <div
-                key={index}
-                ref={el => {
-                  if (el) sectionRefs.current[section.title] = el;
-                }}
-                className={styles.subsection}
-              >
-                <h2 className={styles.subsectionTitle}>{section.title}</h2>
-                <p className={styles.subsectionBody}>{section.content}</p>
-                {section.image_url && (
-                  <figure className={styles.contentImage}>
-                    <img
-                      src={section.image_url}
-                      alt={section.image_caption || `${section.title} image`}
-                      loading="lazy"
-                      onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'; }}
-                    />
-                    {section.image_caption && (
-                      <figcaption>{section.image_caption}</figcaption>
-                    )}
-                  </figure>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className={styles.engagement}>
-            <button
-              className={`${styles.likeButton} ${hasLiked ? styles.liked : ''}`}
-              onClick={handleLike}
-              disabled={hasLiked}
-              aria-label={hasLiked ? 'Post liked' : 'Like post'}
-            >
-              <i className={`fas fa-heart ${hasLiked ? styles.likedIcon : ''}`}></i>
-              {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
-            </button>
-            <div className={styles.shareButtons}>
-              <button
-                className={styles.shareButton}
-                onClick={() => sharePost('twitter')}
-                aria-label="Share on Twitter"
-              >
-                <i className="fab fa-twitter"></i> Twitter
-              </button>
-              <button
-                className={styles.shareButton}
-                onClick={() => sharePost('linkedin')}
-                aria-label="Share on LinkedIn"
-              >
-                <i className="fab fa-linkedin"></i> LinkedIn
-              </button>
+            <h1 className={styles.postTitle}>{post.title}</h1>
+            <div className={styles.meta}>
+              <p className={styles.date}>{formatDate(post.date)}</p>
+              <span className={styles.categoryBadge}>{post.category}</span>
             </div>
-          </div>
-          <div className={styles.commentsSection}>
-            <h3 className={styles.commentsTitle}>Comments ({comments.length})</h3>
-            <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-              <textarea
-                ref={commentInputRef}
-                value={newComment}
-                onChange={e => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className={styles.commentInput}
-                aria-label="Comment input"
-              />
-              <button type="submit" className={styles.commentSubmit}>
-                Post Comment
-              </button>
-            </form>
-            <div className={styles.commentsList}>
-              {comments.map(comment => (
-                <div key={comment.id} className={styles.comment}>
-                  <p className={styles.commentUser}>User {comment.user_id.slice(5, 9)}</p>
-                  <p className={styles.commentContent}>{comment.content}</p>
-                  <p className={styles.commentDate}>
-                    {formatDate(comment.created_at)}
-                  </p>
+            <div className={styles.contentInner}>
+              {subsections.map((section, index) => (
+                <div
+                  key={index}
+                  ref={el => {
+                    if (el) sectionRefs.current[section.title] = el;
+                  }}
+                  className={styles.subsection}
+                >
+                  <h2 className={styles.subsectionTitle}>{section.title}</h2>
+                  <p className={styles.subsectionBody}>{section.content}</p>
+                  {section.image_url && (
+                    <figure className={styles.contentImage}>
+                      <img
+                        src={section.image_url}
+                        alt={section.image_caption || `${section.title} image`}
+                        loading="lazy"
+                        onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'; }}
+                      />
+                      {section.image_caption && (
+                        <figcaption>{section.image_caption}</figcaption>
+                      )}
+                    </figure>
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-          <Link to="/blog" className={styles.backButton}>
-            Back to Blog
-          </Link>
+            <div className={styles.engagement}>
+              <button
+                className={`${styles.likeButton} ${hasLiked ? styles.liked : ''}`}
+                onClick={handleLike}
+                disabled={hasLiked}
+                aria-label={hasLiked ? 'Post liked' : 'Like post'}
+              >
+                <i className={`fas fa-heart ${hasLiked ? styles.likedIcon : ''}`}></i>
+                {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
+              </button>
+              <div className={styles.shareButtons}>
+                <button
+                  className={styles.shareButton}
+                  onClick={() => sharePost('twitter')}
+                  aria-label="Share on Twitter"
+                >
+                  <i className="fab fa-twitter"></i> Twitter
+                </button>
+                <button
+                  className={styles.shareButton}
+                  onClick={() => sharePost('linkedin')}
+                  aria-label="Share on LinkedIn"
+                >
+                  <i className="fab fa-linkedin"></i> LinkedIn
+                </button>
+              </div>
+            </div>
+            <div className={styles.commentsSection}>
+              <h3 className={styles.commentsTitle}>Comments ({comments.length})</h3>
+              <div className={styles.commentForm}>
+                <textarea
+                  ref={commentInputRef}
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className={styles.commentInput}
+                  aria-label="Comment input"
+                />
+                <button onClick={handleCommentSubmit} className={styles.commentSubmit}>
+                  Post Comment
+                </button>
+              </div>
+              <div className={styles.commentsList}>
+                {comments.map(comment => (
+                  <div key={comment.id} className={styles.comment}>
+                    <p className={styles.commentUser}>User {comment.user_id.slice(5, 9)}</p>
+                    <p className={styles.commentContent}>{comment.content}</p>
+                    <p className={styles.commentDate}>
+                      {formatDate(comment.created_at)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Link to="/blog" className={styles.backButton}>
+              Back to Blog
+            </Link>
           </div>
         </article>
       </div>
