@@ -8,5 +8,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [], // Tailwind-specific plugins only
 };
