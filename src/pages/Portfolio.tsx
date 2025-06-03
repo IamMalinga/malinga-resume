@@ -7,6 +7,15 @@ import supabase from '../utils/supabase';
 import { type Basics, type Work, type Education, type Project, type Skill, type Course } from '../types/portfolio';
 import PreloaderComponent from './PreloaderComponent';
 
+// Define types for parsed responsibilities and descriptions
+interface Responsibility {
+  text: string;
+}
+
+interface ProjectDescription {
+  text: string;
+}
+
 const Portfolio: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const basicsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
@@ -56,10 +65,26 @@ const Portfolio: React.FC = () => {
           .select('*')
           .order('start_date', { ascending: false });
         if (workError) throw new Error(`Work fetch error: ${workError.message}`);
-        const parsedWork = workData?.map(job => ({
-          ...job,
-          responsibilities: job.responsibilities.map((item: string) => JSON.parse(item))
-        })) || [];
+        const parsedWork = workData?.map((job: Work) => {
+          try {
+            const responsibilities = job.responsibilities?.map((item: any) => {
+              if (typeof item === 'string') {
+                const parsed = JSON.parse(item);
+                if (typeof parsed === 'object' && parsed !== null && 'text' in parsed) {
+                  return parsed as Responsibility;
+                }
+                throw new Error('Invalid responsibility format');
+              } else if (typeof item === 'object' && item !== null && 'text' in item) {
+                return item as Responsibility;
+              }
+              throw new Error('Invalid responsibility format');
+            }) || [];
+            return { ...job, responsibilities };
+          } catch (parseError) {
+            console.error(`Failed to parse responsibilities for job ${job.id}:`, parseError);
+            return { ...job, responsibilities: [] };
+          }
+        }) || [];
         setWork(parsedWork);
 
         // Fetch Education
@@ -76,10 +101,26 @@ const Portfolio: React.FC = () => {
           .select('*')
           .order('start_date', { ascending: false });
         if (projectsError) throw new Error(`Projects fetch error: ${projectsError.message}`);
-        const parsedProjects = projectsData?.map(project => ({
-          ...project,
-          description: project.description.map((item: string) => JSON.parse(item))
-        })) || [];
+        const parsedProjects = projectsData?.map((project: Project) => {
+          try {
+            // Ensure description is an array of strings before parsing
+            const descriptionArray: string[] =
+              Array.isArray(project.description) && typeof project.description[0] === 'string'
+                ? project.description as unknown as string[]
+                : [];
+            const description = descriptionArray.map((item: string) => {
+              const parsed = JSON.parse(item);
+              if (typeof parsed === 'object' && parsed !== null && 'text' in parsed) {
+                return parsed as ProjectDescription;
+              }
+              throw new Error('Invalid description format');
+            }) || [];
+            return { ...project, description };
+          } catch (parseError) {
+            console.error(`Failed to parse description for project ${project.id}:`, parseError);
+            return { ...project, description: [] };
+          }
+        }) || [];
         setProjects(parsedProjects);
 
         // Fetch Skills
@@ -299,8 +340,6 @@ const Portfolio: React.FC = () => {
         </ul>
       </nav>
       <div className={styles.resume}>
-       
-
         {/* Basics Section */}
         <div ref={basicsRef} id="basics" className={styles.card}>
           <h2 className={styles.sectionTitle} onClick={() => toggleSection('basics')}>
@@ -341,7 +380,7 @@ const Portfolio: React.FC = () => {
           </h2>
           <div className={styles.details}>
             {work.length > 0 ? (
-              work.map((job) => (
+              work.map((job: Work) => (
                 <div key={job.id} className={styles.job}>
                   <span className={styles.date}>
                     {job.start_date ? new Date(job.start_date).getFullYear() : ''} -{' '}
@@ -350,7 +389,7 @@ const Portfolio: React.FC = () => {
                   <strong>{job.title} {job.company ? `| ${job.company}` : ''}</strong> {job.location ? `| ${job.location}` : ''}
                   {Array.isArray(job.responsibilities) && job.responsibilities.length > 0 ? (
                     <ul className={styles.jobList}>
-                      {job.responsibilities.map((task, index) => (
+                      {job.responsibilities.map((task: Responsibility, index: number) => (
                         <li key={index}>{task.text || `Responsibility ${index + 1} unavailable`}</li>
                       ))}
                     </ul>
@@ -372,7 +411,7 @@ const Portfolio: React.FC = () => {
           </h2>
           <div className={styles.details}>
             {education.length > 0 ? (
-              education.map((edu) => (
+              education.map((edu: Education) => (
                 <div key={edu.id} className={styles.educationItem}>
                   <strong>{edu.institution} | {edu.degree}</strong>
                   <p>
@@ -395,7 +434,7 @@ const Portfolio: React.FC = () => {
           </h2>
           <div className={styles.details}>
             {projects.length > 0 ? (
-              projects.map((project) => (
+              projects.map((project: Project) => (
                 <div key={project.id} className={styles.job}>
                   <span className={styles.date}>
                     {project.start_date ? `${new Date(project.start_date).toLocaleString('default', { month: 'short' })} ${new Date(project.start_date).getFullYear()}` : ''} -{' '}
@@ -411,7 +450,7 @@ const Portfolio: React.FC = () => {
                   {project.location ? ` | ${project.location}` : ''}
                   {Array.isArray(project.description) && project.description.length > 0 ? (
                     <ul className={styles.jobList}>
-                      {project.description.map((task, index) => (
+                      {project.description.map((task: ProjectDescription, index: number) => (
                         <li key={index}>{task.text || `Description ${index + 1} unavailable`}</li>
                       ))}
                     </ul>
@@ -442,7 +481,7 @@ const Portfolio: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                {filteredSkills.map((skill) => (
+                {filteredSkills.map((skill: Skill) => (
                   <div key={skill.id} className={styles.skillCategory}>
                     <strong>{skill.category}:</strong> {skill.items.join(', ')}
                   </div>
@@ -461,7 +500,7 @@ const Portfolio: React.FC = () => {
           </h2>
           <div className={styles.details}>
             {courses.length > 0 ? (
-              courses.map((course) => (
+              courses.map((course: Course) => (
                 <div key={course.id} className={styles.course}>
                   <strong>{course.title}</strong>
                   <p>
