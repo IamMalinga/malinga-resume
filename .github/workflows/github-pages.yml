@@ -1,32 +1,48 @@
----
 name: Build and Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
+
 jobs:
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    permissions: # <-- ADD THIS SECTION
-      contents: write   # This grants the workflow write access to your repository's contents
+    permissions:
+      contents: write   # Grants write access to repository contents
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20.15.0'
+          cache: 'npm' # Caches npm dependencies for faster builds
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Use 'npm ci' for consistent installs in CI
+
+      - name: Create .env file
+        run: |
+          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
+          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
+          echo "REACT_APP_SENDINBLUE_KEY=${{ secrets.REACT_APP_SENDINBLUE_KEY }}" >> .env
+        env:
+          CI: false # Disable CI detection to allow .env creation
 
       - name: Build the project
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Deploy to GitHub Pages
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "malinga_samarakoon@outlook.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          npm run deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          # Optional: Force orphan branch for cleaner history
+          force_orphan: true
