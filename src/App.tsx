@@ -103,7 +103,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <ProjectProvider>
-        <BrowserRouter>
+        <BrowserRouter >
           <TitleUpdater />
           <Header />
           <AppRoutes />
