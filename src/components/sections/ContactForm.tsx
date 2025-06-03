@@ -55,7 +55,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
     setShowConfirm(false);
     setErrorMessage(null);
 
-    const apiKey = import.meta.env.VITE_REACT_APP_SENDINBLUE_KEY as string;
+    const apiKey = import.meta.env.VITE_BREVO_KEY as string;
     if (!apiKey) {
       setErrorMessage('API key is missing. Please check your environment configuration.');
       console.error('API key is not set in environment variables. Ensure VITE_REACT_APP_SENDINBLUE_KEY is defined in your .env file.');
