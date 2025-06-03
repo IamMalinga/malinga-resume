@@ -4,9 +4,11 @@ import Button from '../common/Button';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Profile from '../../assets/profile.jpg'; // Replace with your actual profile image path
-import { FaTools } from 'react-icons/fa'; // You can choose any icon
 import * as THREE from 'three';
 import { useTheme } from '../../hooks/useTheme';
+import TopProjects from './TopProjects';
+import ContactForm from './ContactForm'; // Import the new ContactForm component
+import SkillsSection from './SkillsSection'; // Import the new SkillsSection component
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,36 +18,24 @@ const Hero: React.FC = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const contactButtonRef = useRef<HTMLButtonElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  // Ripple refs for the center position
   const ripple1Ref = useRef<HTMLDivElement>(null);
   const ripple2Ref = useRef<HTMLDivElement>(null);
   const ripple3Ref = useRef<HTMLDivElement>(null);
-  // Ripple refs for top-left position
   const rippleTopLeft1Ref = useRef<HTMLDivElement>(null);
   const rippleTopLeft2Ref = useRef<HTMLDivElement>(null);
   const rippleTopLeft3Ref = useRef<HTMLDivElement>(null);
-  // Ripple refs for bottom-right position
   const rippleBottomRight1Ref = useRef<HTMLDivElement>(null);
   const rippleBottomRight2Ref = useRef<HTMLDivElement>(null);
   const rippleBottomRight3Ref = useRef<HTMLDivElement>(null);
-  // Skills section ref
-  const skillsSectionRef = useRef<HTMLDivElement>(null);
-  // Social links container ref
   const socialLinksRef = useRef<HTMLDivElement>(null);
-  // State for modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { theme } = useTheme();
-
-
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
-    // GSAP animation for text, button, and contact button on load
     const tl = gsap.timeline();
 
-    const titleText = titleRef.current?.innerText || '';
+    const titleText = titleRef.current?.innerText || 'Hello!, I am Malinga.';
     const chars = titleText.split(' ');
     titleRef.current!.innerHTML = chars
       .map(char => `<span class="${styles.char}">${char}</span>`)
@@ -81,86 +71,70 @@ const Hero: React.FC = () => {
         '-=0.5'
       );
 
-    // GSAP animation for modal
-    if (isModalOpen && modalRef.current) {
-      gsap.fromTo(
-        modalRef.current,
-        { opacity: 0, scale: 0.2 },
-        { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }
-      );
+    if (!canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const particleCount = 500;
+    const particlesGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 60;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+      velocities[i] = Math.random() * 0.015 + 0.01;
+
+      if (theme === 'light') {
+        colors[i * 3] = Math.random() * 0.5 + 0.5;
+        colors[i * 3 + 1] = 0;
+        colors[i * 3 + 2] = Math.random() * 0.5 + 0.5;
+      } else {
+        colors[i * 3] = 0;
+        colors[i * 3 + 1] = Math.random() * 0.5 + 0.5;
+        colors[i * 3 + 2] = Math.random() * 0.5 + 0.5;
+      }
     }
 
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-     if (!canvasRef.current) return;
-    
-        const canvas = canvasRef.current;
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-    
-        const particleCount = 500; // Increased for more depth
-        const particlesGeometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const velocities = new Float32Array(particleCount);
-        const colors = new Float32Array(particleCount * 6); // Add color variation
-    
-        for (let i = 0; i < particleCount; i++) {
-          positions[i * 3] = (Math.random() - 0.5) * 60;
-          positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
-          positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
-          velocities[i] = Math.random() * 0.015 + 0.01;
-    
-          // Color gradient based on theme
-          if (theme === 'light') {
-            colors[i * 3] = Math.random() * 0.5 + 0.5; // R (pinkish tones)
-            colors[i * 3 + 1] = 0; // G
-            colors[i * 3 + 2] = Math.random() * 0.5 + 0.5; // B
-          } else {
-            colors[i * 3] = 0; // R
-            colors[i * 3 + 1] = Math.random() * 0.5 + 0.5; // G (cyan tones)
-            colors[i * 3 + 2] = Math.random() * 0.5 + 0.5; // B
-          }
-        }
-    
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    
-        const particleMaterial = new THREE.PointsMaterial({
-          size: 0.2,
-          transparent: true,
-          opacity: 0.9,
-          vertexColors: true, // Enable vertex colors for gradient effect
-        });
-    
-        const particles = new THREE.Points(particlesGeometry, particleMaterial);
-        scene.add(particles);
-    
-        camera.position.z = 50;
-    
-        const animateParticles = () => {
-          requestAnimationFrame(animateParticles);
-          const positionsAttr = particles.geometry.attributes.position;
-          const array = positionsAttr.array as Float32Array;
-    
-          for (let i = 0; i < particleCount; i++) {
-            array[i * 3 + 1] -= velocities[i];
-            if (array[i * 3 + 1] < -30) array[i * 3 + 1] += 60;
-          }
-    
-          positionsAttr.needsUpdate = true;
-          renderer.render(scene, camera);
-        };
-    
-        animateParticles();
-    
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.2,
+      transparent: true,
+      opacity: 0.9,
+      vertexColors: true,
+    });
 
+    const particles = new THREE.Points(particlesGeometry, particleMaterial);
+    scene.add(particles);
 
+    camera.position.z = 50;
 
+    const animateParticles = () => {
+      requestAnimationFrame(animateParticles);
+      const positionsAttr = particles.geometry.attributes.position;
+      const array = positionsAttr.array as Float32Array;
 
-    // Ripple animation function
+      for (let i = 0; i < particleCount; i++) {
+        array[i * 3 + 1] -= velocities[i];
+        if (array[i * 3 + 1] < -30) array[i * 3 + 1] += 60;
+      }
+
+      positionsAttr.needsUpdate = true;
+      renderer.render(scene, camera);
+    };
+
+    animateParticles();
+
     const rippleAnimation = (ripple: HTMLDivElement | null, delay: number) => {
       if (ripple) {
         gsap.fromTo(
@@ -178,22 +152,16 @@ const Hero: React.FC = () => {
       }
     };
 
-    // Center ripples
     rippleAnimation(ripple1Ref.current, 0);
     rippleAnimation(ripple2Ref.current, 1);
     rippleAnimation(ripple3Ref.current, 2);
-
-    // Top-left ripples
     rippleAnimation(rippleTopLeft1Ref.current, 0.5);
     rippleAnimation(rippleTopLeft2Ref.current, 1.5);
     rippleAnimation(rippleTopLeft3Ref.current, 2.5);
-
-    // Bottom-right ripples
     rippleAnimation(rippleBottomRight1Ref.current, 0.8);
     rippleAnimation(rippleBottomRight2Ref.current, 1.8);
     rippleAnimation(rippleBottomRight3Ref.current, 2.8);
 
-    // ScrollTrigger animation for hero section
     ScrollTrigger.create({
       trigger: heroRef.current,
       start: 'top 80%',
@@ -202,29 +170,6 @@ const Hero: React.FC = () => {
       onLeaveBack: () => gsap.to(heroRef.current, { opacity: 0.7, scale: 0.95, duration: 1, ease: 'power2.out' }),
       toggleActions: 'play reverse play reverse',
     });
-
-    // GSAP animation for skill cards
-    if (skillsSectionRef.current) {
-      const skillCards = skillsSectionRef.current.querySelectorAll(`.${styles.skillCard}`);
-      gsap.fromTo(
-        skillCards,
-        { opacity: 0, y: 30, scale: 0.8 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: skillsSectionRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-    }
-
 
     return () => {
       tl.kill();
@@ -235,17 +180,7 @@ const Hero: React.FC = () => {
         rippleBottomRight1Ref.current, rippleBottomRight2Ref.current, rippleBottomRight3Ref.current
       ]);
     };
-  }, [isModalOpen]);
-
-  const skills = [
-    { name: 'React', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/react.svg' },
-    { name: 'Angular', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/angular.svg' },
-    { name: 'Spring Boot', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/spring.svg' },
-    { name: 'Android', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/android.svg' },
-    { name: 'Node.js', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/nodedotjs.svg' },
-    { name: 'Docker', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/docker.svg' },
-    { name: 'Cybersecurity', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@9.21.0/icons/cisco.svg' },
-  ];
+  }, []);
 
   const socialLinks = [
     { name: 'Email', icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg', url: 'mailto:malinga_samarakoon@outlook.com' },
@@ -269,25 +204,6 @@ const Hero: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    if (modalRef.current) {
-      gsap.to(modalRef.current, {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.3,
-        ease: 'power3.in',
-        onComplete: () => setIsModalOpen(false),
-      });
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Placeholder for form submission logic
-    console.log('Form submitted');
-    handleCloseModal();
-  };
-
   return (
     <section className={styles.hero} ref={heroRef} aria-label="Hero Section with Profile Introduction">
       <canvas ref={canvasRef} className={styles.particleCanvas} />
@@ -297,7 +213,12 @@ const Hero: React.FC = () => {
             ref={titleRef}
             className={`${styles.title} text-4xl md:text-6xl font-bold mb-6 leading-tight`}
           >
-            Hello!, I am Malinga.
+            Hello!,
+            
+            
+          </h1>
+          <h1 className={`${styles.title} text-4xl md:text-6xl font-bold mb-6 leading-tight`}>
+            I am  Malinga.
           </h1>
           <p
             ref={subtitleRef}
@@ -315,133 +236,61 @@ const Hero: React.FC = () => {
             View My CV
           </Button>
         </div>
-        {/* Center ripple container */}
         <div className={styles.rippleContainer}>
           <div ref={ripple1Ref} className={styles.ripple}></div>
           <div ref={ripple2Ref} className={styles.ripple}></div>
           <div ref={ripple3Ref} className={styles.ripple}></div>
         </div>
-        {/* Top-left ripple container */}
         <div className={`${styles.rippleContainer} ${styles.rippleTopLeft}`}>
           <div ref={rippleTopLeft1Ref} className={styles.ripple}></div>
           <div ref={rippleTopLeft2Ref} className={styles.ripple}></div>
           <div ref={rippleTopLeft3Ref} className={styles.ripple}></div>
         </div>
-        {/* Bottom-right ripple container */}
         <div className={`${styles.rippleContainer} ${styles.rippleBottomRight}`}>
           <div ref={rippleBottomRight1Ref} className={styles.ripple}></div>
           <div ref={rippleBottomRight2Ref} className={styles.ripple}></div>
           <div ref={rippleBottomRight3Ref} className={styles.ripple}></div>
         </div>
         <div className={styles.profileSection}>
-          
-        <div className={styles.imageContent}>
-          <div className={styles.profileImageContainer}>
-            <img
-              src={Profile}
-              alt="Malinga's Profile"
-              className={styles.profileImage}
-            />
-            <button
-              ref={contactButtonRef}
-              className={styles.contactButton}
-              onClick={handleContactClick}
-              aria-label="Open contact form"
-            >
-              <i className="fas fa-envelope"></i>
-            </button>
-          </div>
-          <div className={styles.socialLinksContainer} ref={socialLinksRef}>
-            <h3 className={styles.socialLinksTitle}>Find Me Online</h3>
-            <div className={styles.socialLinks}>
-              {socialLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.socialLink}
-                  aria-label={`Link to ${link.name} profile`}
-                >
-                  <img src={link.icon} alt={`${link.name} icon`} className={styles.socialIcon} />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-      {/* Contact Modal */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal} ref={modalRef}>
-            <button
-              className={styles.closeButton}
-              onClick={handleCloseModal}
-              aria-label="Close contact form"
-            >
-              <i className="fas fa-times"></i>
-            </button>
-            <h2 className={styles.modalTitle}>Contact Me</h2>
-            <form className={styles.contactForm} onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  placeholder="Your Name"
-                  className={styles.formInput}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  placeholder="Your Email"
-                  className={styles.formInput}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="message">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  placeholder="Your Message"
-                  className={styles.formTextarea}
-                ></textarea>
-              </div>
+          <div className={styles.imageContent}>
+            <div className={styles.profileImageContainer}>
+              <img
+                src={Profile}
+                alt="Malinga's Profile"
+                className={styles.profileImage}
+              />
               <button
-                type="submit"
-                className={`${styles.submitButton} px-6 py-2 text-lg font-semibold rounded-full`}
+                ref={contactButtonRef}
+                className={styles.contactButton}
+                onClick={handleContactClick}
+                aria-label="Open contact form"
               >
-                Send Message
+                <i className="fas fa-envelope"></i>
               </button>
-            </form>
-          </div>
-        </div>
-      )}
-      {/* Skills Section */}
-      <div className={styles.skillsSection} ref={skillsSectionRef}>
-        <h2 className={styles.skillsTitle}><FaTools className={styles.skillsIcon} />Tech Toolbox</h2>
-        <div className={styles.skillsGrid}>
-          {skills.map((skill, index) => (
-            <div key={index} className={styles.skillCard}>
-              <div className={styles.skillCardInner}>
-                <img src={skill.icon} alt={`${skill.name} icon`} className={styles.skillIcon} />
-                <div className={styles.skillOverlay}>
-                  <span className={styles.skillName}>{skill.name}</span>
-                </div>
+            </div>
+            <div className={styles.socialLinksContainer} ref={socialLinksRef}>
+              <h3 className={styles.socialLinksTitle}>Find Me Online</h3>
+              <div className={styles.socialLinks}>
+                {socialLinks.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.socialLink}
+                    aria-label={`Link to ${link.name} profile`}
+                  >
+                    <img src={link.icon} alt={`${link.name} icon`} className={styles.socialIcon} />
+                  </a>
+                ))}
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
+      <ContactForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <TopProjects />
+      <SkillsSection />
     </section>
   );
 };

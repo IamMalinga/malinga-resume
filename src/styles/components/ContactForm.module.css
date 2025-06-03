@@ -1,148 +1,400 @@
-.form {
-  max-width: 500px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.1);
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #e5e7eb;
+  --text-color: #333;
+  --background-color: #ffffff;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  --hero-bg: #f5f5f5;
+  --featured-bg: #e5e7eb;
+}
+
+[data-theme='dark'] {
+  --primary-color: #60a5fa;
+  --secondary-color: #4b5563;
+  --text-color: #e5e7eb;
+  --background-color: #1f2937;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  --hero-bg: #1f2937;
+  --featured-bg: #374151;
+}
+
+.contactOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 400vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  padding-top: 20px;
+}
+
+.contactModal {
+  background: var(--background-color);
   border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(0, 255, 204, 0.3);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(0, 255, 204, 0.2);
-  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+  padding: 30px;
+  width: 90%;
+  max-width: 900px;
+  top: 25%;
+  display: flex;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideDown 0.5s ease-out;
+  overflow: hidden;
   position: relative;
-  z-index: 2;
 }
 
-.form.light {
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), inset 0 0 15px rgba(255, 0, 204, 0.3);
-  border-color: rgba(255, 0, 204, 0.2);
+[data-theme='dark'] .contactModal {
+  background: var(--background-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.form:hover {
-  transform: translateY(-8px) rotateX(5deg);
-  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 255, 204, 0.5);
+.contactImage {
+  flex: 1;
+  background: url('https://via.placeholder.com/400x500') no-repeat center;
+  background-size: cover;
+  border-radius: 15px 0 0 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.form.light:hover {
-  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 0, 204, 0.5);
-}
-
-.field {
-  margin-bottom: 1.5rem;
-}
-
-.label {
-  display: block;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.2rem;
-  color: #00ffcc;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: color 0.3s ease;
-}
-
-.label.light {
-  color: #ff00cc;
-}
-
-.input,
-.textarea {
+.contactImage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 0.75rem 1rem;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(37, 99, 235, 0.3), transparent);
+  border-radius: 15px 0 0 15px;
+}
+
+.iconWrapper {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 50%;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.iconWrapper i {
+  color: var(--background-color);
+  font-size: 3rem;
+}
+
+.contactFormContainer {
+  flex: 1.5;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--hero-bg);
+  border-radius: 0 15px 15px 0;
+}
+
+[data-theme='dark'] .contactFormContainer {
+  background: var(--hero-bg);
+}
+
+.contactTitle {
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  text-align: center;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradientShift 5s infinite alternate;
+}
+
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--secondary-color);
+  padding: 10px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  font-size: 20px;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.closeButton:hover {
+  color: var(--primary-color);
+  transform: scale(1.15);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.formInput,
+.formTextarea {
+  padding: 12px;
   border: none;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #e0e0ff;
-  font-family: 'Poppins', sans-serif;
+  background: var(--featured-bg);
+  color: var(--text-color);
   font-size: 1rem;
-  box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2);
-  transition: box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
-.input.light,
-.textarea.light {
-  background: rgba(255, 255, 255, 0.15);
-  color: #2a2a72;
-  box-shadow: inset 0 0 10px rgba(255, 0, 204, 0.2);
-}
-
-.input:focus,
-.textarea:focus {
+.formInput:focus,
+.formTextarea:focus {
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.15), inset -2px -2px 5px rgba(255, 255, 255, 0.15), 0 0 10px var(--primary-color);
   outline: none;
-  box-shadow: inset 0 0 15px #00ffcc, 0 0 10px #00ffcc;
 }
 
-.input.light:focus,
-.textarea.light:focus {
-  box-shadow: inset 0 0 15px #ff00cc, 0 0 10px #ff00cc;
+[data-theme='dark'] .formInput,
+[data-theme='dark'] .formTextarea {
+  background: var(--featured-bg);
 }
 
-.textarea {
-  min-height: 150px;
+.formTextarea {
   resize: vertical;
-}
-
-.error {
-  display: block;
-  color: #ff5555;
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-  text-shadow: 0 0 5px #ff5555;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-.error.light {
-  color: #ff3366;
-  text-shadow: 0 0 5px #ff3366;
+  min-height: 120px;
 }
 
 .submitButton {
-  background: #00ffcc;
-  color: #0f0c29;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 15px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--background-color);
+  padding: 12px;
   font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.submitButton.light {
-  background: #ff00cc;
-  color: #f0f4f8;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), -2px -2px 5px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
 }
 
 .submitButton:hover {
-  background: #00ff99;
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #00ffcc;
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.3);
 }
 
-.submitButton.light:hover {
-  background: #ff1493;
-  box-shadow: 0 0 20px #ff00cc;
+.confirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  animation: fadeIn 0.3s ease;
+}
+
+.confirmDialog {
+  background: var(--background-color);
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  text-align: center;
+  animation: popIn 0.3s ease-out;
+}
+
+[data-theme='dark'] .confirmDialog {
+  background: var(--background-color);
+}
+
+.confirmMessage {
+  color: var(--text-color);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.confirmButton,
+.cancelButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.confirmButton {
+  background: linear-gradient(135deg, #34c759, #28a745);
+  color: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.confirmButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cancelButton {
+  background: linear-gradient(135deg, #ff3b30, #d32f2f);
+  color: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.cancelButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.successPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #34c759, #28a745);
+  color: #fff;
+  padding: 15px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1002;
+  animation: popIn 0.5s ease-out, fadeOut 2s ease-out 2s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 @media (max-width: 768px) {
-  .form {
-    padding: 1.5rem;
+  .contactModal {
+    flex-direction: column;
+    max-width: 450px;
+    padding: 20px;
   }
 
-  .label {
-    font-size: 1rem;
+  .contactImage {
+    height: 200px;
+    border-radius: 15px 15px 0 0;
   }
 
-  .input,
-  .textarea {
-    font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
+  .contactFormContainer {
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+  }
+
+  .contactTitle {
+    font-size: 1.6rem;
+  }
+
+  .formInput,
+  .formTextarea {
+    font-size: 0.95rem;
+    padding: 10px;
   }
 
   .submitButton {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .iconWrapper i {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contactModal {
+    max-width: 320px;
+    padding: 15px;
+  }
+
+  .contactImage {
+    height: 150px;
+  }
+
+  .contactTitle {
+    font-size: 1.3rem;
+  }
+
+  .formInput,
+  .formTextarea {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .submitButton {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .confirmDialog {
+    max-width: 300px;
+    padding: 15px;
+  }
+
+  .confirmMessage {
     font-size: 1rem;
-    padding: 0.5rem 1rem;
+  }
+
+  .confirmButton,
+  .cancelButton {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .iconWrapper i {
+    font-size: 2rem;
   }
 }

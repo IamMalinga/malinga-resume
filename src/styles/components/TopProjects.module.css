@@ -1,0 +1,288 @@
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #e5e7eb;
+  --text-color: #333;
+  --background-color: #ffffff;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  --hero-bg: #f5f5f5;
+  --featured-bg: #e5e7eb;
+}
+
+[data-theme='dark'] {
+  --primary-color: #60a5fa;
+  --secondary-color: #4b5563;
+  --text-color: #e5e7eb;
+  --background-color: #1f2937;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  --hero-bg: #1f2937;
+  --featured-bg: #374151;
+}
+
+.topProjects {
+  max-width: 1200px;
+  position: relative;
+  padding: 4rem 2rem;
+  color: var(--text-color);
+  overflow: hidden;
+  border-radius: 1.5rem;
+}
+
+.particleCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--primary-color);
+  z-index: 1;
+  position: relative;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(37, 99, 235, 0.5), 0 0 30px rgba(37, 99, 235, 0.3); /* Using shades of --primary-color */
+  animation: neonBlink 1.5s infinite alternate;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%); /* Using --primary-color with transparency */
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: pulse 4s infinite ease-in-out;
+}
+
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  z-index: 1;
+  position: relative;
+}
+
+.projectCard {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  display: flex;
+  flex-direction: column;
+  height: 500px; /* Fixed height for all cards */
+}
+
+.projectCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+.projectCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+
+.projectImageContainer {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: var(--featured-bg);
+  border-radius: 0.75rem 0.75rem 0 0;
+  position: relative;
+}
+
+.projectImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.projectCard:hover .projectImage {
+  transform: scale(1.05);
+}
+
+.projectContent {
+  padding: 1.2rem 1.5rem;
+  flex: 1; /* Allow content to grow and fill space */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  margin-bottom: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.3);
+}
+
+.projectTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  
+}
+
+.projectTitleLink {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.projectTitleLink:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-top: 0.3rem;
+}
+
+.icon {
+  color: var(--primary-color);
+}
+
+.jobList {
+  margin-top: 0.8rem;
+  padding-left: 1rem;
+  list-style-type: disc;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 200px; /* optional: define max height if not already */
+  
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) transparent;
+}
+
+/* Chrome, Edge, Safari */
+.jobList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.jobList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jobList::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.jobList::-webkit-scrollbar-thumb:hover {
+  background-color: var(--nav-hover-color);
+}
+
+
+.jobList li {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.links {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--secondary-color);
+  background: linear-gradient(to bottom, var(--featured-bg), var(--background-color));
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto; /* Pin to bottom */
+}
+
+.link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.link:hover {
+  color: var(--secondary-color);
+}
+
+.loading,
+.error,
+.noProjects {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  padding: 4rem 2rem;
+  z-index: 1;
+  position: relative;
+}
+
+.spinner {
+  border: 4px solid var(--secondary-color);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1024px) {
+  .projectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectCard {
+    border-radius: 0.75rem;
+    height: auto; /* Allow height to adjust on smaller screens */
+  }
+
+  .projectContent,
+  .links {
+    padding: 1rem;
+  }
+
+  .projectImageContainer {
+    height: 150px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}

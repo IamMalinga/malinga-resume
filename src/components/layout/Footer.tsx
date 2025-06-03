@@ -45,21 +45,31 @@ const Footer: React.FC = () => {
 
     return () => {
       gsap.killTweensOf([socialsRef.current?.children, copyrightRef.current]);
+      links?.forEach((link) => {
+        link.removeEventListener('mouseenter', () => {});
+        link.removeEventListener('mouseleave', () => {});
+      });
     };
   }, []);
 
-  const currentDate = new Date();
-  const formattedDateTime = `${currentDate.toLocaleString('en-US', {
+  // Static last updated timestamp (replace with your actual deployment date)
+  const lastUpdated = new Date('2025-06-03T13:43:00+05:30'); // Placeholder: June 3, 2025, 1:43 PM IST
+  const formattedDateTime = `${lastUpdated.toLocaleString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
     timeZoneName: 'short',
-  })} on ${currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+  })} on ${lastUpdated.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })}`;
 
   return (
     <footer className={styles.footer}>
       <div ref={socialsRef} className={styles.socials}>
-        <a href="linkedin.com/in/malinga-samarakoon-b8333527b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <a href="https://linkedin.com/in/malinga-samarakoon-b8333527b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
           <i className="fab fa-linkedin"></i>
         </a>
         <a href="https://github.com/IamMalinga" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
@@ -70,7 +80,7 @@ const Footer: React.FC = () => {
         </a>
       </div>
       <p ref={copyrightRef} className={styles.copyright}>
-        © {currentDate.getFullYear()} Malinga Samarakoon. All rights reserved. | Last updated: {formattedDateTime}
+        © {new Date().getFullYear()} Malinga Samarakoon. All rights reserved. | Last updated: {formattedDateTime}
       </p>
     </footer>
   );

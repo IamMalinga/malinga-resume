@@ -103,7 +103,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <ProjectProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL_RESUME || '/malinga-resume/'}>
           <TitleUpdater />
           <Header />
           <AppRoutes />
