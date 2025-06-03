@@ -1,9 +1,6 @@
 {
   "name": "malinga-resume",
-  "homepage": "https://iammalinga.github.io/malinga-resume",
-  "description": "A personal resume website showcasing my skills, projects, and experience.",
-  "author": "Malinga",
-  "license": "MIT",
+  "homepage": "https://www.malingasamarakoon.online",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,13 +13,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.2",
-    "@getbrevo/brevo": "^2.2.0",
-    "@supabase/supabase-js": "^2.49.8",
-    "@tailwindcss/postcss": "^4.1.6",
-    "@types/react-router-dom": "^5.3.3",
-    "classnames": "^2.5.1",
-    "dot-env": "^0.0.1",
     "gh-pages": "^6.3.0",
     "gsap": "^3.13.0",
     "lucide-react": "^0.509.0",
