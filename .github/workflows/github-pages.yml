@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
-          echo "VITE_REACT_APP_SENDINBLUE_KEY=${{ secrets.VITE_REACT_APP_SENDINBLUE_KEY }}" >> .env
+          echo "VITE_BREVO_KEY=${{ secrets.VITE_BREVO_KEY }}" >> .env
         env:
           CI: false # Disable CI detection to allow .env creation
 
