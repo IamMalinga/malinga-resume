@@ -12,6 +12,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [showSuccess, setShowSuccess] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && modalRef.current) {
@@ -30,24 +31,37 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
         scale: 0.8,
         duration: 0.3,
         ease: 'power3.in',
-        onComplete: onClose,
+        onComplete: () => {
+          onClose();
+          modalRef.current!.style.display = 'none'; // Ensure modal is hidden after animation
+        },
       });
+    } else {
+      onClose(); // Fallback if modalRef is not available
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowConfirm(true); // Show confirmation dialog
+    setShowConfirm(true);
   };
 
   const confirmSend = async () => {
     setShowConfirm(false);
+    setErrorMessage(null);
 
-    const apiKey = import.meta.env.REACT_APP_SENDINBLUE_KEY as string;
+    const apiKey = import.meta.env.VITE_REACT_APP_SENDINBLUE_KEY as string;
+    if (!apiKey) {
+      setErrorMessage('API key is missing. Please check your environment configuration.');
+      console.error('API key is not set in environment variables. Ensure VITE_REACT_APP_SENDINBLUE_KEY is defined in your .env file.');
+      return;
+    }
+
     const url = 'https://api.brevo.com/v3/smtp/email';
 
     const emailData = {
@@ -72,7 +86,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send email');
+        const errorText = await response.text();
+        throw new Error(`Failed to send email: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
@@ -84,7 +99,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
       }, 3000);
     } catch (error) {
       console.error('Failed to send email:', error);
-      alert('Failed to send email. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : 'An unexpected error occurred.');
+      alert(errorMessage || 'Failed to send email. Please try again.');
     }
   };
 
@@ -97,6 +113,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
           <button
             className={styles.closeButton}
             onClick={handleCloseModal}
+            onTouchStart={handleCloseModal} // Added touch event for mobile
             aria-label="Close contact form"
           >
             <i className="fas fa-times"></i>
@@ -153,6 +170,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
               >
                 Send Message
               </button>
+              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
             </form>
           </div>
         </div>
