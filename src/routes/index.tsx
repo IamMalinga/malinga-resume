@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
 import About from '../pages/About';
 import Portfolio from '../pages/Portfolio';
-import Contact from '../pages/Contact';
 import Blog from '../pages/Blog';
 import NotFound from '../pages/NotFound';
 import BlogView from '../pages/BlogView';
@@ -14,7 +13,6 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/portfolio" element={<Portfolio />} />
-      <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogView />} />
       <Route path="*" element={<NotFound />} />
