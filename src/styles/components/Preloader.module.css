@@ -35,7 +35,7 @@
 }
 
 [data-theme='dark'] .preloader {
-  background: rgba(var(--background-color-rgb), 0.95);
+  background: rgba(var(--background-color-rgb), 1);
 }
 
 .preloaderContainer {
@@ -48,7 +48,7 @@
 }
 
 [data-theme='dark'] .preloaderContainer {
-  background: rgba(var(--background-color-rgb), 0.85);
+  background: rgba(var(--background-color-rgb), 1);
 }
 
 .preloaderSvg {
