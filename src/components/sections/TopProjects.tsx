@@ -69,7 +69,6 @@ const TopProjects: React.FC = () => {
     if (!projectsRef.current || !titleRef.current || !canvasRef.current) return;
 
     const ctx = gsap.context(() => {
-
       const projectCards = projectsRef.current
         ? projectsRef.current.querySelectorAll(`.${styles.projectCard}`)
         : [];
@@ -116,13 +115,14 @@ const TopProjects: React.FC = () => {
     const particlesGeometry = new THREE.BufferGeometry();
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
-    particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 0.1));
 
     const particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        color: { value: new THREE.Color(0xffffff) },
+        color: { value: new THREE.Color(0xffffff) }, // white
       },
       vertexShader: `
+        uniform vec3 color;
         attribute float size;
         varying vec3 vColor;
         void main() {
